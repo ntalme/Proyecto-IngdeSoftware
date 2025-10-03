@@ -1,0 +1,281 @@
+/* Fuente base */
+body {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  background-color: #f4f6f9;
+} 
+
+/* Encabezado */
+.content-header h1{
+  font-size:35px;
+  font-weight:600;
+  color:#000;
+  line-height:1.25;
+  margin:0;
+  margin-bottom: 0.5rem; 
+}
+
+.content-header .descripcion-pagina {
+  margin-top: 0.5rem !important;   /* espacio entre título y texto */
+}
+
+.descripcion-pagina{
+  font-size:1rem;
+  color:#6c757d;
+  margin:.8rem 0 .5rem 0;
+  padding:0;
+  /* Por defecto: varias líneas (mejor lectura en pantallas medianas) */
+  white-space:normal;
+  overflow:visible;
+  text-overflow:unset;
+}
+
+.linea-divisora{
+  border:0;
+  border-top:1px solid #dee2e6;
+  margin:0 0 .4rem 0 !important;
+}
+
+.content-header{
+  padding-top: .5rem;
+  padding-bottom: .25rem;   
+}
+
+.content-header .row.mb-2{  
+  margin-bottom: .25rem !important;
+}
+
+.descripcion-pagina{
+  margin: .35rem 0 .25rem 0; 
+}
+
+.linea-divisora{
+  margin: .15rem 0 .35rem 0 !important; 
+}
+
+
+.content{ padding-top: .25rem; }
+.content > .container-fluid > .card:first-child,
+.content > .container-fluid > .row:first-child .card:first-child{
+  margin-top: 0;
+}
+
+.card{ margin-top: 0; }
+
+/* Asegura que la descripción no se corte */
+.content-header .descripcion-pagina {
+  font-size: 1rem;
+  color: #6c757d;
+  margin: 0;
+  margin-top: .25rem;      
+  margin-bottom: .5rem;    
+  white-space: normal !important;  
+  overflow: visible !important;      
+  text-overflow: unset !important;  
+}
+
+.content-header .linea-divisora {
+  border: 0;
+  border-top: 1px solid #dee2e6;
+  margin: .25rem 0 1rem 0;  /* pegada a la descripción, separada del contenido */
+}
+
+/* Card de la tabla */
+.card-tabla-productos {
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #ffffff;
+  margin-top: 0 !important; /* sube la card */
+}
+
+/* Encabezado oscuro opcional */
+.card-tabla-productos .card-header.bg-dark {
+  background-color: #000000 !important;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/*--------------- Tabla ------------- */
+/* Tabla de productos vendidos */
+.table-vendidos {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+.table-vendidos thead th {
+  background-color: #727272;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: .5px;
+  border: none;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.table-vendidos tbody tr {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  border-radius: 10px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.table-vendidos tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.08);
+}
+
+.table-vendidos tbody td {
+  border: none;
+  padding: 12px 14px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* Bordes redondeados */
+.table-vendidos tbody td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.table-vendidos tbody td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* Columna de monto destacada */
+.table-vendidos td:last-child {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+
+/* Botón Consultar personalizado */
+.btn-consultar {
+  background:  #e0a800;
+  border: none;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 0.4rem;
+  padding: 0.45rem 1.2rem;
+  transition: all 0.2s ease-in-out;
+  color: #ffffff !important;
+}
+
+.btn-consultar i {
+  margin-right: 6px;
+}
+
+.btn-consultar:hover {
+  background: #d39e00;
+  transform: translateY(-1px);
+}
+
+/* Icono en header */
+.card-tabla-productos .card-header i {
+  margin-right: 6px;
+  margin-top: 0.2rem !important; /* ~3px */
+  color: #ffc107;
+}
+
+/* Header spacing */
+.content-header {
+  margin-bottom: 1rem;
+}
+
+/* ── Ajustes finos de espaciado SOLO para esta vista ───────────── */
+
+/* Reduce padding superior del contenedor */
+.content-wrapper .content {
+  padding-top: 0.25rem !important;
+}
+
+/* Asegura que el wrapper de la tabla no agregue espacio arriba */
+.card-tabla-productos .table-responsive {
+  margin-top: 0 !important;
+}
+
+/* Ajusta padding interno si aún hay mucho aire */
+.card-tabla-productos .card-body {
+  padding-top: 0.5rem !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #tablaProductosVendidos {
+    font-size: 0.85rem;
+  }
+
+  .card-tabla-productos .card-header {
+    text-align: center;
+  }
+
+  .content-header h1 {
+    font-size: 1.2rem;
+  }
+}
+
+/*============== BOTÓN TABLA ==============*/
+/* Contenedor de la paginación */
+.dataTables_wrapper .dataTables_paginate {
+  display: flex;
+  gap: .5rem;
+  justify-content: center;  /* céntralo, cámbialo a flex-end si quieres alineado a la derecha */
+  margin-top: 1rem;
+}
+
+/* Botones base */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: #fff;
+  color: #374151 !important; /* gris oscuro */
+  border: 1px solid #d1d5db;
+  padding: .45rem .9rem;
+  font-size: .9rem;
+  border-radius: .5rem;
+  transition: all .2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,.05);
+}
+
+/* Hover */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #050505;  
+  color: #ffffff !important;
+  border-color: #050505;;
+  box-shadow: 0 4px 8px rgba(0,0,0,.12);
+}
+
+/* Página actual */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #050505; 
+  color: #ffffff !important;
+  font-weight: 600;
+  border-color: #050505; 
+  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+}
+
+/* Botones deshabilitados */
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  background: #f3f4f6;
+  color: #9ca3af !important;
+  border-color: #e5e7eb;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Buscador */
+#buscadorSCWrap .form-control {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+}
+#buscadorSCWrap .input-group-text {
+  border-left: 0;
+  background: #fff;
+  cursor: pointer;
+}
+#buscadorSCWrap .form-control:focus { box-shadow: none; }

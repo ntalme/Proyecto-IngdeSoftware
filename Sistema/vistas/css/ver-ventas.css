@@ -1,0 +1,287 @@
+/*============== BASE ==============*/  
+body{
+  font-family:'Poppins',sans-serif;
+  font-size:14px;
+  background:#f4f6f9;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ---------- Encabezado ---------- */
+.content-header h1{
+  font-size:35px;
+  font-weight:600;
+  color:#000;
+  line-height:1.25;
+  margin:0;
+}
+
+.descripcion-pagina{
+  font-size:1rem;
+  color:#6c757d;
+  margin:.8rem 0 .5rem 0;
+  padding:0;
+  /* Por defecto: varias líneas (mejor lectura en pantallas medianas) */
+  white-space:normal;
+  overflow:visible;
+  text-overflow:unset;
+}
+
+.linea-divisora{
+  border:0;
+  border-top:1px solid #dee2e6;
+  margin:0 0 .4rem 0 !important;
+}
+
+/* Padding y margen en secciones */
+.content-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #343a40;
+}
+
+.content-header {
+  margin-bottom: 1rem;
+}
+
+/* Responsive: tabla se adapta mejor en pantallas pequeñas */
+@media (max-width: 768px) {
+  #tablaVentas {
+    font-size: 0.85rem;
+  }
+
+  .card-tabla-productos .card-header {
+    text-align: center;
+  }
+
+  .content-header h1 {
+    font-size: 1.2rem;
+  }
+}
+
+/* ---------- Buscador ---------- */
+#buscadorVentasWrap .form-control{
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+#buscadorVentasWrap .btn{
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ---------- Filtros ---------- */
+.controles-orden {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Estilo de las etiquetas (Ordenar por / Dirección) */
+.controles-orden label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #444;
+  margin-right: 6px;
+}
+
+/* Selects */
+.controles-orden select {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #333;
+  transition: all 0.2s ease-in-out;
+  min-width: 150px;
+}
+
+.controles-orden select:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 0.15rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+/* Opcional: darle hover */
+.controles-orden select:hover {
+  border-color: #888;
+}
+
+/* Input de búsqueda */
+#buscadorVentas {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  border-radius: 8px 0 0 8px;
+}
+
+#btnBuscarVentas {
+  border-radius: 0 8px 8px 0;
+  color: #555;
+  transition: background 0.2s;
+}
+
+#btnBuscarVentas:hover {
+  background-color: #4a90e2;
+  color: #fff;
+}
+
+/* ====== TABLA====== */
+.table-fresh {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;     /* espacio entre filas */
+  margin: 0;
+}
+
+#tablaVentas thead th {
+  background-color: #727272;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Cabecera */
+.table-fresh thead th {
+  background: none;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: .5px;
+  border: none;
+  padding: 8px 12px;
+}
+
+/* Filas como “cards” */
+.table-fresh tbody tr {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  border-radius: 12px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.table-fresh tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.08);
+}
+
+/* Celdas */
+.table-fresh tbody td {
+  border: none;
+  padding: 14px 16px;
+  vertical-align: middle;
+}
+.table-fresh tbody td:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+.table-fresh tbody td:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+/* Columnas especiales */
+.table-fresh td.col-num { 
+  font-weight: 600;
+  color: #1f2937;
+  text-align: center;
+}
+.table-fresh td.col-total {
+  font-weight: 700;
+  color: #2563eb;   /* azul */
+  font-size: 15px;
+}
+.table-fresh td.col-observacion {
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Productos con badges */
+.table-fresh td.col-productos li {
+  display: inline-block;
+  background: #f3f4f6;
+  padding: 4px 10px;
+  margin: 2px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+/* Botones */
+.table-fresh .btn-descargar {
+  background: #ef4444;
+  border: none;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background .2s ease, transform .1s ease;
+}
+.table-fresh .btn-descargar:hover { background: #dc2626; }
+.table-fresh .btn-descargar:active { transform: scale(.96); }
+
+/* Contenedor de la paginación */
+.dataTables_wrapper .dataTables_paginate {
+  display: flex;
+  gap: .5rem;
+  justify-content: center;  /* céntralo, cámbialo a flex-end si quieres alineado a la derecha */
+  margin-top: 1rem;
+}
+
+/* Botones base */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: #fff;
+  color: #374151 !important; /* gris oscuro */
+  border: 1px solid #d1d5db;
+  padding: .45rem .9rem;
+  font-size: .9rem;
+  border-radius: .5rem;
+  transition: all .2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,.05);
+}
+
+/* Hover */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #0a0a24;  
+  color: #ffffff !important;
+  border-color: #0a0a24;;
+  box-shadow: 0 4px 8px rgba(0,0,0,.12);
+}
+
+/* Página actual */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #0a0a24; 
+  color: #ffffff !important;
+  font-weight: 600;
+  border-color: #0a0a24; 
+  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+}
+
+/* Botones deshabilitados */
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  background: #f3f4f6;
+  color: #9ca3af !important;
+  border-color: #e5e7eb;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.lista-productos-venta{ list-style: none; padding-left: 18px; } /* mantiene apariencia <ul> limpia */
+  .badge-promo{
+    display:inline-block;
+    padding:3px 8px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:600;
+    vertical-align:middle;
+    margin-left:6px;
+    line-height:1.2;
+    border:1px solid transparent;
+    background:#eef2ff; color:#111827; /* default */
+  }
+  .badge-promo.is-descuento{ background:#e6f7ee; border-color:#bfe7cf; color:#065f46; }
+  .badge-promo.is-precio   { background:#eaf3ff; border-color:#c9ddff; color:#1e3a8a; }
+  .badge-promo.is-2x1      { background:#fff4e5; border-color:#ffe0b3; color:#7c2d12; }
+  .badge-promo.is-generic  { background:#f3f4f6; border-color:#e5e7eb; color:#374151; }

@@ -1,0 +1,319 @@
+/* ========== Pagina Añadir Stock========== */
+/* Fuente base */
+body {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  background-color: #f4f6f9;
+} 
+
+/* Encabezado */
+.content-header h1{
+  font-size:35px;
+  font-weight:600;
+  color:#000;
+  line-height:1.25;
+  margin:0;
+}
+
+.descripcion-pagina{
+  font-size:1rem;
+  color:#6c757d;
+  margin:.8rem 0 .5rem 0;
+  padding:0;
+  /* Por defecto: varias líneas (mejor lectura en pantallas medianas) */
+  white-space:normal;
+  overflow:visible;
+  text-overflow:unset;
+}
+
+.linea-divisora{
+  border:0;
+  border-top:1px solid #dee2e6;
+  margin:0 0 .4rem 0 !important;
+}
+
+/* Tabla */
+.table {
+  font-size: 0.95rem;
+}
+
+.table thead {
+  background-color: #727272;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.table th, .table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: #f0f8ff;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Botón "Añadir stock" */
+.btnAgregarStock {
+  background-color:  #f7c738; 
+  border-color:  #f7c738; 
+  color: rgb(0, 0, 0);
+  font-weight: 500;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btnAgregarStock:hover {
+  background-color:  #fcb911; 
+  border-color: #fcb911; 
+}
+
+/* ============== MODAL: Añadir Stock ================== */
+
+/* Header con gradiente azul */
+#modalAgregarStock .modal-header-custom {
+  background: linear-gradient(90deg, #070b13);
+  color: #fff;
+  border-bottom: none;
+  padding: .9rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Icono en header */
+#modalAgregarStock .modal-header-custom .modal-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  margin-right: .5rem;
+  font-size: 16px;
+}
+
+/* Botón cerrar (X) */
+#modalAgregarStock .modal-header .close {
+  opacity: .85;
+  text-shadow: none;
+  font-size: 1.4rem;
+}
+#modalAgregarStock .modal-header .close:hover {
+  opacity: 1;
+}
+
+/* Botón Cancelar */
+#modalAgregarStock .btn-cancelar {
+  background: #e5e7eb;
+  color: #374151;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: .5rem 1.2rem;
+  transition: all .2s ease-in-out;
+}
+#modalAgregarStock .btn-cancelar:hover {
+  background: #d1d5db;
+  color: #111827;
+  transform: translateY(-1px);
+}
+
+/* Botón Guardar */
+#modalAgregarStock .btn-guardar-stock {
+  background: linear-gradient(90deg, #f7c738);
+  border: none;
+  color: #000000;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: .5rem 1.2rem;
+  transition: all .2s ease-in-out;
+}
+#modalAgregarStock .btn-guardar-stock:hover {
+  background: linear-gradient(90deg, #fcb911);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(142, 133, 56, 0.25);
+}
+
+/* Responsive: modal grande con margen en móvil */
+@media (max-width: 575.98px){
+  .modal-dialog.modal-lg{ margin: 1rem; }
+}
+
+/* ============== Buscador ================== */
+.input-group .form-control:focus {
+  box-shadow: none;
+  border-color: #80bdff; /* azul claro estándar */
+}
+
+.input-group-text {
+  border-left: 0;      /* evita doble borde */
+  cursor: pointer;     /* muestra que es clickeable */
+}
+
+
+/* ============== Filtros ================== */
+.filtros-stock {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Labels */
+.filtros-stock .form-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #444;
+  margin: 0 6px 4px 0;
+}
+
+/* Selects */
+.select-bonito {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  min-width: 150px;
+  transition: all 0.2s ease;
+}
+.select-bonito:hover { border-color: #999; }
+.select-bonito:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 .15rem rgba(74,144,226,.25);
+  outline: none;
+}
+
+/* Buscador */
+#buscadorStockWrap .form-control {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+}
+#buscadorStockWrap .input-group-text {
+  border-left: 0;
+  background: #fff;
+  cursor: pointer;
+}
+#buscadorStockWrap .form-control:focus { box-shadow: none; }
+
+/* ============== Tabla ================== */
+/* Tabla Add Stock */
+.table-addstock {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+.table-addstock thead th {
+  background-color: #727272;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: .5px;
+  border: none;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.table-addstock tbody tr {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  border-radius: 10px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.table-addstock tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.08);
+}
+
+.table-addstock tbody td {
+  border: none;
+  padding: 12px 14px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* Bordes redondeados en extremos */
+.table-addstock tbody td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.table-addstock tbody td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* Cantidad */
+.table-addstock td:nth-child(7) {
+  font-weight: 600;
+  color: #020a1b;
+}
+
+/* Fechas */
+.table-addstock td:nth-child(8),
+.table-addstock td:nth-child(9) {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Acciones */
+.table-addstock td:last-child .btn {
+  font-size: 13px;
+  padding: 4px 8px;
+  margin: 0 2px;
+  border-radius: 6px;
+}
+
+/*============== BOTÓN TABLA ==============*/
+/* Contenedor de la paginación */
+.dataTables_wrapper .dataTables_paginate {
+  display: flex;
+  gap: .5rem;
+  justify-content: center;  /* céntralo, cámbialo a flex-end si quieres alineado a la derecha */
+  margin-top: 1rem;
+}
+
+/* Botones base */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: #fff;
+  color: #374151 !important; /* gris oscuro */
+  border: 1px solid #d1d5db;
+  padding: .45rem .9rem;
+  font-size: .9rem;
+  border-radius: .5rem;
+  transition: all .2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,.05);
+}
+
+/* Hover */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #050505;  
+  color: #ffffff !important;
+  border-color: #050505;;
+  box-shadow: 0 4px 8px rgba(0,0,0,.12);
+}
+
+/* Página actual */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #050505; 
+  color: #ffffff !important;
+  font-weight: 600;
+  border-color: #050505; 
+  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+}
+
+/* Botones deshabilitados */
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  background: #f3f4f6;
+  color: #9ca3af !important;
+  border-color: #e5e7eb;
+  box-shadow: none;
+  cursor: not-allowed;
+}

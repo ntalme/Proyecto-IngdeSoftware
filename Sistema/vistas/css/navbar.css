@@ -1,0 +1,388 @@
+/* ========== Navbar ========== */
+/* Estilo general del navbar */
+.main-header.navbar {
+  background-color: #000000;
+  border-bottom: 1px solid #e0e0e0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 0.5rem 1rem;
+}
+
+/* Ícono del menú */
+.navbar .fas.fa-bars {
+  color: #ffffff;
+  font-size: 1.2rem;
+  transition: color 0.2s ease-in-out;
+}
+
+/* Usuario visible */
+.navbar-nav.ml-auto .nav-link {
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.navbar-nav.ml-auto .nav-link:hover {
+  color: #d3d3d3;
+}
+
+/* Dropdown */
+.dropdown-menu {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0px 8px 16px rgba(255, 255, 255, 0.08);
+  background-color: #ffffff;
+}
+
+/* Botón Cerrar Sesión */
+.user-body .btn {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  padding: 6px 12px;
+  transition: all 0.2s ease-in-out;
+}
+
+.user-body .btn:hover {
+  background-color: #eaeaea;
+  color: #000;
+}
+
+/* Responsive: ocultar nombre en móviles */
+@media (max-width: 768px) {
+  .navbar-nav.ml-auto .nav-link span {
+    display: none;
+  }
+}
+
+/* === Usuario en navbar === */
+.navbar-white .navbar-nav .user-menu > a.nav-link,
+.navbar-white .navbar-nav .user-menu > a.nav-link:focus,
+.navbar-white .navbar-nav .user-menu > a.nav-link:active,
+.navbar-white .navbar-nav .user-menu.show > a.nav-link,
+.navbar-white .navbar-nav .user-menu > a.nav-link:hover {
+  color: #ffffff !important;   /* mantiene texto en blanco */
+  background: transparent !important;
+  text-decoration: none;
+}
+.navbar-white .navbar-nav .user-menu > a.nav-link i {
+  color: inherit !important;
+}
+
+/* === Ícono de pérdida/consumo === */
+.navbar-white .navbar-nav .nav-item > a.nav-link,
+.navbar-white .navbar-nav .nav-item > a.nav-link:focus,
+.navbar-white .navbar-nav .nav-item > a.nav-link:active,
+.navbar-white .navbar-nav .nav-item > a.nav-link:hover {
+  color: #ffffff !important;   /* mantiene ícono blanco */
+  background: transparent !important;
+  text-decoration: none;
+}
+.navbar-white .navbar-nav .nav-item > a.nav-link i {
+  color: inherit !important;
+}
+
+/* Asegurar que el ícono herede el mismo color */
+.navbar-white .navbar-nav .user-menu > a.nav-link i {
+  color: inherit !important;
+}
+
+/* ========== Modal Perdida ========== */
+:root{
+  --modal-header-bg: #070b13; 
+  --modal-header-fg: #ffffff;
+}
+
+#modalNavbarPerdida .tabla-wrap-navbar{
+    border:1px solid #e5e7eb; border-radius:.9rem; overflow:auto;
+    max-height: 360px; background:#fff;
+  }
+  #modalNavbarPerdida thead th{
+    position:sticky; top:0; z-index:2; background:#eef2ff; border-bottom:1px solid #e5e7eb;
+    font-weight:700; color:#4b5563;
+  }
+  #modalNavbarPerdida .font-mono{
+    font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  }
+  #modalNavbarPerdida .table tbody tr:hover{ background:#f8fafc; cursor: pointer; }
+  #modalNavbarPerdida tr.seleccionado{ background:#e7f1ff !important; }
+  #modalNavbarPerdida .nombre-celda{ line-height:1.25; }
+  
+/* Header personalizable */
+.modal-header-custom{
+  background-color: var(--modal-header-bg) !important;
+  color: var(--modal-header-fg) !important;
+  border-bottom: none;
+}
+
+/* Bordes y sombras “modernas” */
+.rounded-xl { border-radius: 1rem; }
+.modal-content{
+  border: 0;
+  border-radius: 1rem;
+  box-shadow: 0 20px 50px rgba(18, 38, 63, .18);
+  overflow: hidden;
+}
+
+/* Botón primario amarillo con letras negras */
+.btn-modern{
+  background-color: #f7c738;   /* Amarillo */
+  color: #000 !important;      /* Texto negro */
+  border: none;
+  font-weight: 600;
+  border-radius: .5rem;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+  transition: transform .05s ease, box-shadow .2s ease, background-color .2s ease;
+}
+.btn-modern:hover{
+  background-color: #e6b800;   /* Amarillo más oscuro */
+}
+.btn-modern:active{
+  transform: translateY(1px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.10);
+}
+
+/* Inputs e input-group “limpios” */
+.input-group-text{
+  background-color: #f5f7fb;
+  border-color: #e6e9ef;
+}
+.form-control, .custom-select{
+  border-color: #e6e9ef;
+}
+.form-control:focus, .custom-select:focus{
+  border-color: #89b4ff;
+  box-shadow: 0 0 0 .2rem rgba(49,130,206,.15);
+  outline: 0;
+}
+
+/* Títulos/labels más legibles */
+.font-weight-semibold{ font-weight: 600; }
+
+/* Select y inputs grandes (consistentes) */
+.custom-select-lg, .input-group-lg > .form-control, 
+.input-group-lg > .custom-select, .input-group-lg > .input-group-prepend > .input-group-text,
+.input-group-lg > .input-group-append > .input-group-text{
+  height: calc(1.5em + 1.5rem + 2px);
+  padding: .75rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Badge suave para mostrar stock */
+.badge-soft-info{
+  color: #0c4a6e;
+  background-color: #e0f2fe;
+  border: 1px solid #bae6fd;
+  padding: .45rem .65rem;  
+  border-radius: .375rem;
+  font-weight: 700;       
+  font-size: 0.9rem;       
+}
+
+/* Feedback de error más visible cuando corresponda */
+.invalid-feedback{ display: none; }
+.is-invalid ~ .invalid-feedback,
+#errorCantidad.is-visible{ display:block; }
+
+/* Responsive: modal grande respira mejor en móvil */
+@media (max-width: 575.98px){
+  .modal-dialog.modal-lg{ margin: 1rem; }
+}
+
+/* ========== Modal Promociones ========== */
+/* ===== Tamaño del diálogo ===== */
+.modal-promos{ max-width:950px; width:100%; }
+
+/* ===== Look general del modal ===== */
+.promo2-modal{
+  border:none; border-radius:14px; overflow:hidden;
+  box-shadow:0 12px 32px rgba(0,0,0,.2);
+  font-size:.92rem;
+}
+.promo2-header{
+  background:#1f2937; padding:.85rem 1rem; font-weight:700;
+}
+.promo2-header .promo2-header-icon{ font-size:1rem; opacity:.9; }
+.promo2-body{ background:#fff; padding:1rem; }
+.promo2-footer{
+  background:#f9fafb; border-top:1px solid #e5e7eb; padding:.8rem 1rem;
+}
+.promo2-primary{
+  background:#2563eb; color:#fff; border-color:#1d4ed8;
+}
+.promo2-primary:hover{ background:#1d4ed8; }
+
+/* ===== Etiquetas y ayudas ===== */
+.promo2-label{ font-weight:700; color:#374151; margin-bottom:.25rem; }
+.promo2-hint{ font-size:.8rem; color:#6b7280; }
+
+/* ===== Ajustes de filas compactas ===== */
+.row-compact .form-group{ margin-bottom:.5rem; }
+
+/* ===== Buscador a la derecha ===== */
+.buscador-prod{ max-width:420px; width:100%; }
+.buscador-prod .input-group-text{ background:#fff; }
+
+/* ===== Tabla con scroll y bordes suaves ===== */
+.promoTable-wrap{
+  max-height:380px; overflow:auto;
+  border:1px solid #e5e7eb; border-radius:10px;
+}
+#promo_tablaProd thead th{
+  position:sticky; top:0; z-index:1;
+  background:#f3f4f6; font-weight:700; font-size:.8rem;
+  color:#374151;
+}
+#promo_tablaProd tbody td{ vertical-align:middle; }
+#promo_tablaProd tbody tr{ cursor:pointer; }
+
+/* ===== Estado seleccionado ===== */
+#promo_tablaProd tbody tr.selected{
+  background:#eef6ff;
+}
+#promo_tablaProd tbody tr.selected td{ color:#0b3b7a; }
+
+/* ===== Franja de ayuda + contador bajo la tabla ===== */
+.promo-helpers{
+  background:#f9fafb;
+  border:1px solid #e5e7eb; border-top:none;
+  border-radius:0 0 10px 10px;
+  padding:.5rem .75rem; margin-top:-1px;
+}
+
+/* ===== Accesibilidad/pequeños detalles ===== */
+.font-mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+.close{ opacity:.8; }
+.close:hover{ opacity:1; }
+
+/* ===== Responsive fino ===== */
+@media (max-width: 575.98px){
+  .buscador-prod{ max-width:100%; }
+  .promoTable-wrap{ max-height:300px; }
+}
+
+
+
+/* ==================== NOTIFICACIONES EN NAVBAR ==================== */
+/* Dropdown general */
+.dropdown-menu-notif {
+  min-width: 340px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 20px rgba(0,0,0,.12);
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Encabezado del dropdown */
+.dropdown-menu-notif .dropdown-header {
+  font-weight: 600;
+  font-size: 0.95rem;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Ítems (notificaciones) */
+.dropdown-menu-notif .list-group-item {
+  border: none;
+  border-bottom: 1px solid #f1f1f1;
+  padding: 12px 14px;
+  background: #fff;
+  transition: background .2s ease, transform .15s ease;
+}
+
+.dropdown-menu-notif .list-group-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-menu-notif .list-group-item:hover {
+  background: #f9fbff;
+  transform: translateX(2px);
+}
+
+/* Título del producto */
+.dropdown-menu-notif .list-group-item h6 {
+  font-size: .95rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Estado */
+.dropdown-menu-notif .list-group-item small.estado {
+  font-size: .75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.dropdown-menu-notif .list-group-item small.text-warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.dropdown-menu-notif .list-group-item small.text-danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Texto descripción */
+.dropdown-menu-notif .list-group-item p {
+  font-size: .85rem;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+/* Info de stock */
+.dropdown-menu-notif .list-group-item small {
+  font-size: .8rem;
+  color: #6b7280;
+}
+
+.dropdown-menu-notif .list-group-item strong {
+  color: #111;
+}
+
+/* Botón final */
+.dropdown-menu-notif .btn-outline-secondary {
+  border-radius: 8px;
+  font-size: .85rem;
+  font-weight: 500;
+  transition: all .2s ease;
+}
+
+.dropdown-menu-notif .btn-outline-secondary:hover {
+  background: #f3f4f6;
+  color: #111;
+}
+
+/* Dropdown bonito */
+.dropdown-menu-notif{min-width:340px;border-radius:12px;border:1px solid #e5e7eb;box-shadow:0 8px 20px rgba(0,0,0,.12);overflow:hidden;font-size:.9rem}
+.dropdown-menu-notif .notif-header{background:#f9fafb;border-bottom:1px solid #e5e7eb;padding:.75rem 1rem;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.dropdown-menu-notif .notif-footer{background:#f8f9fa;border-top:1px solid #eaeaea;padding:.5rem 1rem}
+
+/* Ítems tipo “notificación” */
+.dropdown-menu-notif .list-group-item{border:none;border-bottom:1px solid #f1f1f1;padding:12px 14px;background:#fff;transition:background .2s ease,transform .15s ease}
+.dropdown-menu-notif .list-group-item:last-child{border-bottom:none}
+.dropdown-menu-notif .list-group-item:hover{background:#f9fbff;transform:translateX(2px)}
+.dropdown-menu-notif .list-group-item h6{margin:0 0 4px;font-size:.95rem;font-weight:600;color:#111827;display:flex;justify-content:space-between;align-items:center}
+.dropdown-menu-notif .list-group-item p{font-size:.85rem;color:#374151;margin-bottom:6px}
+.dropdown-menu-notif .list-group-item .stock-info{font-size:.8rem;color:#6b7280}
+.dropdown-menu-notif .list-group-item .stock-info strong{color:#111}
+
+/* Chips de estado */
+.dropdown-menu-notif .estado{font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:6px;text-transform:uppercase;margin-left:8px;white-space:nowrap}
+.dropdown-menu-notif .estado.critico{background:#fff3cd;color:#856404}
+.dropdown-menu-notif .estado.agotado{background:#f8d7da;color:#721c24}
+
+

@@ -1,0 +1,220 @@
+/* ========== Pagina Stock Crítico ========== */
+/* Fuente base */
+body {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  background-color: #f4f6f9;
+} 
+
+/* Encabezado */
+.content-header h1{
+  font-size:35px;
+  font-weight:600;
+  color:#000;
+  line-height:1.25;
+  margin:0;
+}
+
+.descripcion-pagina{
+  font-size:1rem;
+  color:#6c757d;
+  margin:.8rem 0 .5rem 0;
+  padding:0;
+  /* Por defecto: varias líneas (mejor lectura en pantallas medianas) */
+  white-space:normal;
+  overflow:visible;
+  text-overflow:unset;
+}
+
+.linea-divisora{
+  border:0;
+  border-top:1px solid #dee2e6;
+  margin:0 0 .4rem 0 !important;
+}
+
+/* Párrafo informativo de stock crítico */
+.content-header p.text-muted {
+  color: #333 !important;         /* texto principal más oscuro */
+  font-size: 0.95rem;
+}
+
+/* Colorea las palabras clave dentro del párrafo */
+.content-header p.text-muted strong:first-of-type {
+  color: #dc3545;  /* rojo bootstrap = Agotados */
+}
+
+.content-header p.text-muted strong:last-of-type {
+  color: #ffc107;  /* amarillo bootstrap = Bajo mínimo */
+}
+
+/* ---------- Filtros ---------- */
+/* Fuente global */
+.filtros-sc { font-family: 'Poppins', sans-serif; }
+
+/* Labels */
+.filtros-sc .form-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #444;
+  margin: 0 6px 4px 0;
+}
+
+/* Selects bonitos */
+.select-bonito {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  min-width: 150px;
+  transition: all 0.2s ease;
+}
+.select-bonito:hover { border-color: #999; }
+.select-bonito:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 .15rem rgba(74,144,226,.25);
+  outline: none;
+}
+
+/* Buscador */
+#buscadorSCWrap .form-control {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+}
+#buscadorSCWrap .input-group-text {
+  border-left: 0;
+  background: #fff;
+  cursor: pointer;
+}
+#buscadorSCWrap .form-control:focus { box-shadow: none; }
+
+
+/* -----------------------Tabla------------------------------*/
+.table-stock {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+/* Encabezado */
+.table-stock thead th {
+  background-color: #727272;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: .5px;
+  border: none;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+/* Filas como tarjetas */
+.table-stock tbody tr {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  border-radius: 10px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.table-stock tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.08);
+}
+
+/* Celdas */
+.table-stock tbody td {
+  border: none;
+  padding: 12px 14px;
+  vertical-align: middle;
+  text-align: center;
+}
+.table-stock tbody td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  font-weight: 600;
+  color: #1f2937;
+}
+.table-stock tbody td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* Columnas especiales */
+.table-stock td.col-cantidad {
+  font-weight: 700;
+  color: #dc2626; /* rojo para advertencia */
+}
+.table-stock td.col-stockmin {
+  font-weight: 600;
+  color: #ea580c; /* naranja */
+}
+.table-stock td.col-estado {
+  font-weight: 600;
+  padding: 6px 12px;
+}
+.table-stock td.col-estado span {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.table-stock td.col-estado .critico {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.table-stock td.col-estado .ok {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/*============== BOTÓN TABLA ==============*/
+/* Contenedor de la paginación */
+.dataTables_wrapper .dataTables_paginate {
+  display: flex;
+  gap: .5rem;
+  justify-content: center;  /* céntralo, cámbialo a flex-end si quieres alineado a la derecha */
+  margin-top: 1rem;
+}
+
+/* Botones base */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: #fff;
+  color: #374151 !important; /* gris oscuro */
+  border: 1px solid #d1d5db;
+  padding: .45rem .9rem;
+  font-size: .9rem;
+  border-radius: .5rem;
+  transition: all .2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,.05);
+}
+
+/* Hover */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #050505;  
+  color: #ffffff !important;
+  border-color: #050505;;
+  box-shadow: 0 4px 8px rgba(0,0,0,.12);
+}
+
+/* Página actual */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #050505; 
+  color: #ffffff !important;
+  font-weight: 600;
+  border-color: #050505; 
+  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+}
+
+/* Botones deshabilitados */
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  background: #f3f4f6;
+  color: #9ca3af !important;
+  border-color: #e5e7eb;
+  box-shadow: none;
+  cursor: not-allowed;
+}

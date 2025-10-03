@@ -1,0 +1,248 @@
+/* ========== Pagina Cierre de Caja ========== */
+
+/* ---------------- Fuente base ---------------- */
+body {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  background-color: #f4f6f9;
+} 
+
+/* ---------------- Encabezado ---------------- */
+.content-header h1 {
+  font-size: 35px;
+  font-weight: 600;
+  color: #000;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.descripcion-pagina {
+  font-size: 1rem;
+  color: #6c757d;
+  margin: .8rem 0 .5rem 0;
+  padding: 0;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+}
+
+.linea-divisora {
+  border: 0;
+  border-top: 1px solid #dee2e6;
+  margin: 0 0 .4rem 0 !important;
+}
+
+/* ----------------  Botón "Ver ventas"---------------- */
+.btn-ver-ventas{
+  background: linear-gradient(90deg, #f7c738);
+  color: #000000;             
+  border: none;
+  border-radius: 8px;
+  padding: .35rem .55rem;       
+  transition: transform .9s ease, box-shadow .2s ease, background .2s ease;
+}
+.btn-ver-ventas:hover{
+  background: linear-gradient(90deg, #dbac1f);
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 6px 14px rgba(218,157,3,.25);
+}
+.btn-ver-ventas:active{
+  transform: scale(.98);
+  box-shadow: none;
+}
+
+/* ---------------- Modal General ---------------- */
+.modal-elegante {
+  border-radius: 12px;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+  border-bottom: none;
+  padding: 1rem 1.5rem;
+}
+
+.modal-body {
+  background-color: #f9fafc;
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  background-color: #f1f3f6;
+  border-top: none;
+}
+
+/* ---------------- Modal Personalizado ---------------- */
+/* Header */
+.modal-header-custom {
+  background: linear-gradient(135deg, #070b13);
+  color: #fff;
+  border-bottom: none;
+  padding: 1rem 1.5rem;
+}
+
+.modal-header-custom .modal-title i {
+  color: #ffffff;
+}
+
+/* Body */
+.modal-body-custom {
+  background-color: #f9fbfd;
+  padding: 1.5rem;
+}
+
+/* Footer */
+.modal-footer-custom {
+  background-color: #f1f4f7;
+  border-top: none;
+}
+
+/* Alerta personalizada */
+.alert-custom {
+  background-color: #f7c738;
+  border: 1px solid #ffffff;
+  color: #070b13;
+  font-weight: 500;
+  border-radius: .5rem;
+}
+
+/* Encabezado de tabla en modal */
+.thead-custom {
+  background: #070b13;
+  color: #fff;
+}
+
+/* Hover de filas en modal */
+.table-hover tbody tr:hover {
+  background-color: #eef6ff;
+}
+
+
+/* ---------------- Tabla ---------------- */
+.table-cierres {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;   /* espacio entre filas */
+}
+
+/* Cabecera */
+.table-cierres thead th {
+   background-color: #727272;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: .5px;
+  border: none;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+/* Filas tipo “card” */
+.table-cierres tbody tr {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  border-radius: 10px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.table-cierres tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.08);
+}
+
+/* Celdas */
+.table-cierres tbody td {
+  border: none;
+  padding: 12px 14px;
+  vertical-align: middle;
+  text-align: center;
+}
+.table-cierres tbody td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  font-weight: 600;
+  color: #1f2937;
+}
+.table-cierres tbody td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* Columnas destacadas */
+.table-cierres td.col-total {
+  font-weight: 700;
+  font-size: 15px;
+  color: #2563eb;  /* azul */
+}
+.table-cierres td.col-observaciones {
+  font-style: italic;
+  color: #6b7280;
+}
+
+/* Botón de acciones */
+.table-cierres .btn-accion {
+  background: #10b981;
+  border: none;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background .2s ease, transform .1s ease;
+}
+.table-cierres .btn-accion:hover { background: #059669; }
+.table-cierres .btn-accion:active { transform: scale(.96); }
+
+/*============== BOTÓN TABLA ==============*/
+/* Contenedor de la paginación */
+.dataTables_wrapper .dataTables_paginate {
+  display: flex;
+  gap: .5rem;
+  justify-content: center;  /* céntralo, cámbialo a flex-end si quieres alineado a la derecha */
+  margin-top: 1rem;
+}
+
+/* Botones base */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: #fff;
+  color: #374151 !important; /* gris oscuro */
+  border: 1px solid #d1d5db;
+  padding: .45rem .9rem;
+  font-size: .9rem;
+  border-radius: .5rem;
+  transition: all .2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,.05);
+}
+
+/* Hover */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #050505;  
+  color: #ffffff !important;
+  border-color: #050505;;
+  box-shadow: 0 4px 8px rgba(0,0,0,.12);
+}
+
+/* Página actual */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #050505; 
+  color: #ffffff !important;
+  font-weight: 600;
+  border-color: #050505; 
+  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+}
+
+/* Botones deshabilitados */
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  background: #f3f4f6;
+  color: #9ca3af !important;
+  border-color: #e5e7eb;
+  box-shadow: none;
+  cursor: not-allowed;
+}

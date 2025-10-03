@@ -1,0 +1,504 @@
+/* ========== Pagina Crear Productos========== */
+/* Fuente base */
+body {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  background-color: #f4f6f9;
+} 
+
+/* Encabezado */
+.content-header h1{
+  font-size:35px;
+  font-weight:600;
+  color:#000;
+  line-height:1.25;
+  margin:0;
+}
+
+.descripcion-pagina{
+  font-size:1rem;
+  color:#6c757d;
+  margin:.8rem 0 .5rem 0;
+  padding:0;
+  /* Por defecto: varias líneas (mejor lectura en pantallas medianas) */
+  white-space:normal;
+  overflow:visible;
+  text-overflow:unset;
+}
+
+.linea-divisora{
+  border:0;
+  border-top:1px solid #dee2e6;
+  margin:0 0 .4rem 0 !important;
+}
+
+/* Botón Agregar producto */
+.card-header .btn {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  box-shadow: none;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.card-header .btn i {
+  margin-right: 6px;
+}
+
+/* Tabla */
+.table {
+  font-size: 0.95rem;
+}
+
+.table thead {
+  background-color:  #727272;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.table th,
+.table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: #f0f8ff;
+}
+
+/* Color personalizado del botón Agregar producto */
+.btn-agregar-producto {
+ background:#ffc107;
+  color:#000;
+  border:none;
+  font-weight:500;
+  border-radius:6px;
+  padding:6px 14px;
+  transition:all .2s ease-in-out;
+}
+
+/* Al pasar el mouse */
+.btn-agregar-producto:hover {
+  background-color: #f7c738; 
+  border-color: #f7c738; 
+}
+
+.btn-editar {
+  background-color: #f7c738 !important;
+  border-color: #fcb911 !important;
+  color: rgb(255, 255, 255) !important;
+}
+
+/* Botón eliminar */
+.btnEliminarProducto {
+  padding: 4px 10px;
+  font-size: 0.85rem;
+}
+
+/* Ícono eliminar dentro del botón */
+.btnEliminarProducto i {
+  margin-right: 4px;
+}
+
+/* ============== MODAL: Agregar Producto ================== */
+
+/* Header con gradiente */
+#modalAgregarProducto .modal-header-custom {
+  background: linear-gradient(90deg, #070b13); /* azul fuerte */
+  color: #fff;
+  border-bottom: none;
+  padding: .9rem 1.25rem;
+}
+
+/* Icono dentro del header */
+#modalAgregarProducto .modal-header-custom .modal-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  margin-right: .5rem;
+  font-size: 16px;
+}
+
+/* Botón Cerrar (X) */
+#modalAgregarProducto .modal-header .close {
+  opacity: .85;
+  text-shadow: none;
+  font-size: 1.4rem;
+}
+#modalAgregarProducto .modal-header .close:hover {
+  opacity: 1;
+}
+
+/* Botón Cancelar */
+#modalAgregarProducto .btn-cancelar {
+  background: #e5e7eb;
+  color: #374151;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: .5rem 1.2rem;
+  transition: all .2s ease-in-out;
+}
+#modalAgregarProducto .btn-cancelar:hover {
+  background: #d1d5db;
+  color: #111827;
+  transform: translateY(-1px);
+}
+
+/* Botón Guardar */
+#modalAgregarProducto .btn-guardar-producto {
+  background: linear-gradient(90deg, #f7c738); /* verde confirmación */
+  border: none;
+  color: #000000;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: .5rem 1.2rem;
+  transition: all .2s ease-in-out;
+}
+#modalAgregarProducto .btn-guardar-producto:hover {
+  background: linear-gradient(90deg, #fcb911);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(142, 133, 56, 0.25);
+}
+
+/* Ajustes responsivos suaves */
+@media (max-width: 575.98px) {
+  .modal-dialog.modal-lg { margin: 1rem; }
+}
+
+
+/* ============== MODAL: Editar Producto ================== */
+
+/* Header con gradiente */
+#modalEditarProducto .modal-header-custom {
+  background: linear-gradient(90deg, #070b13); 
+  color: #fff;
+  border-bottom: none;
+  padding: .9rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Icono dentro del header */
+#modalEditarProducto .modal-header-custom .modal-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  margin-right: .5rem;
+  font-size: 16px;
+}
+
+/* Botón cerrar (X) */
+#modalEditarProducto .modal-header .close {
+  opacity: .85;
+  text-shadow: none;
+  font-size: 1.4rem;
+}
+#modalEditarProducto .modal-header .close:hover {
+  opacity: 1;
+}
+
+/* Botón Cancelar */
+#modalEditarProducto .btn-cancelar {
+  background: #e5e7eb;
+  color: #374151;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: .5rem 1.2rem;
+  transition: all .2s ease-in-out;
+}
+#modalEditarProducto .btn-cancelar:hover {
+  background: #d1d5db;
+  color: #111827;
+  transform: translateY(-1px);
+}
+
+/* Botón Guardar cambios */
+#modalEditarProducto .btn-guardar-producto {
+  background: linear-gradient(90deg, #f7c738); 
+  border: none;
+  color: #000000;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: .5rem 1.2rem;
+  transition: all .2s ease-in-out;
+}
+#modalEditarProducto .btn-guardar-producto:hover {
+  background: linear-gradient(90deg, #fcb911);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(142, 129, 56, 0.25);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .table {
+    font-size: 0.85rem;
+  }
+
+  .btnEliminarProducto {
+    font-size: 0.75rem;
+  }
+}
+
+/* ========== Aviso Eliminar Producto ========== */
+/* Contenedor */
+.swal-theme{
+  border-radius: 14px;
+  padding: 28px 28px 22px;
+  box-shadow: 0 20px 50px rgba(18,38,63,.18);
+  border: 0;
+}
+
+/* Título y texto */
+.swal-title{
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: #1f2937; /* gris oscuro */
+  margin-top: .25rem;
+}
+.swal-body, .swal-text{
+  color: #6b7280; /* gris medio */
+  font-size: 1rem;
+}
+
+/* Icono */
+.swal-icon{
+  border-color: #ff0202 !important; /* borde círculo */
+  color: #ff0000 !important;         /* signo */
+}
+
+/* Boton Confirmar */
+.swal-confirm{
+  background: #2563eb;  
+  border-color: #091d49;
+  color: #fff;
+  border-radius: .4rem;
+  padding: .45rem .9rem;  
+  font-size: 0.9rem;       
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
+}
+.swal-confirm:hover{ filter: brightness(1.05); }
+
+/* Boton Cancelar */
+.swal-cancel{
+  border-radius: .4rem;
+  padding: .45rem .9rem;   
+  font-size: 0.9rem;     
+}
+/* Espaciado entre botones (Bootstrap a veces los pega) */
+.swal2-actions{ gap: 10px !important; }
+
+/* vistas/css/crear-productos.css */
+#buscadorProductosWrap .form-control:focus {
+  box-shadow: none;
+  border-color: #80bdff;
+}
+#buscadorProductosWrap .input-group-text {
+  background-color: #fff;
+  cursor: pointer;
+}
+.table thead th { white-space: nowrap; }
+
+/* ------------------- Tabla --------------------------- */
+.table-productos {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  width: 100%;
+}
+
+/* Encabezado */
+.table-productos thead th {
+  background-color: #727272;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: .5px;
+  border: none;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+/* Filas con estilo tarjeta */
+.table-productos tbody tr {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  border-radius: 10px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.table-productos tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.08);
+}
+
+/* Celdas */
+.table-productos tbody td {
+  border: none;
+  padding: 12px 14px;
+  vertical-align: middle;
+  text-align: center;
+}
+.table-productos tbody td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.table-productos tbody td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* Imagen del producto */
+.table-productos td.col-imagen img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Precios */
+.table-productos td.col-precio-compra {
+  color: #6b7280;
+  font-weight: 500;
+}
+.table-productos td.col-precio-venta {
+  color: #059669;
+  font-weight: 700;
+}
+
+/* Acciones */
+.table-productos td.col-acciones .btn {
+  margin: 0 2px;
+  font-size: 13px;
+  padding: 4px 8px;
+}
+
+/*============== BOTÓN TABLA ==============*/
+/* Contenedor de la paginación */
+.dataTables_wrapper .dataTables_paginate {
+  display: flex;
+  gap: .5rem;
+  justify-content: center;  /* céntralo, cámbialo a flex-end si quieres alineado a la derecha */
+  margin-top: 1rem;
+}
+
+/* Botones base */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: #fff;
+  color: #374151 !important; /* gris oscuro */
+  border: 1px solid #d1d5db;
+  padding: .45rem .9rem;
+  font-size: .9rem;
+  border-radius: .5rem;
+  transition: all .2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,.05);
+}
+
+/* Hover */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #050505;  
+  color: #ffffff !important;
+  border-color: #050505;;
+  box-shadow: 0 4px 8px rgba(0,0,0,.12);
+}
+
+/* Página actual */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #050505; 
+  color: #ffffff !important;
+  font-weight: 600;
+  border-color: #050505; 
+  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+}
+
+/* Botones deshabilitados */
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  background: #f3f4f6;
+  color: #9ca3af !important;
+  border-color: #e5e7eb;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ---------- Filtros ---------- */
+/* Fuente global */
+.filtros-sc { font-family: 'Poppins', sans-serif; }
+
+/* Labels */
+.filtros-sc .form-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #444;
+  margin: 0 6px 4px 0;
+}
+
+/* Selects bonitos */
+.select-bonito {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  min-width: 150px;
+  transition: all 0.2s ease;
+}
+.select-bonito:hover { border-color: #999; }
+.select-bonito:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 .15rem rgba(74,144,226,.25);
+  outline: none;
+}
+
+/* === Columna "Fecha vencimiento" ===
+   Inventario = col 12, Productos = col 11
+-------------------------------------------------- */
+
+/* Fecha: rojo + negrita */
+.tabla-inventario tbody td:nth-child(12),
+.table-productos tbody td:nth-child(11){
+  color: #dc3545;           /* rojo */
+  font-weight: 700;         /* negrita */
+  line-height: 1.2;
+  vertical-align: middle;
+}
+
+/* Badge debajo con buen espaciado y look */
+.tabla-inventario tbody td:nth-child(12) .badge,
+.table-productos tbody td:nth-child(11) .badge{
+  display: inline-block;
+  margin-top: 6px;          /* separa del número de fecha */
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1.1;
+  background: #ffc107;      /* amarillo */
+  color: #111;              /* texto oscuro */
+  border: 0;                /* opcional: sin borde */
+}
+
+/* Si alguna tabla centraba la columna y prefieres a la izquierda: */
+.tabla-inventario thead th:nth-child(12),
+.tabla-inventario tbody td:nth-child(12),
+.table-productos thead th:nth-child(11),
+.table-productos tbody td:nth-child(11){
+  text-align: left;         /* o 'center' si te gusta centrado */
+}

@@ -1,0 +1,515 @@
+/* ========================== ESTILOS GENERALES ========================== */
+body {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  background-color: #f4f6f9;
+} 
+
+/* ---------- Encabezado ---------- */
+.content-header h1{
+  font-size:35px;
+  font-weight:600;
+  color:#000;
+  line-height:1.25;
+  margin:0;
+}
+
+.descripcion-pagina{
+  font-size:1rem;
+  color:#6c757d;
+  margin:.8rem 0 .5rem 0;
+  padding:0;
+  /* Por defecto: varias líneas (mejor lectura en pantallas medianas) */
+  white-space:normal;
+  overflow:visible;
+  text-overflow:unset;
+}
+
+.linea-divisora{
+  border:0;
+  border-top:1px solid #dee2e6;
+  margin:0 0 .4rem 0 !important;
+}
+
+.card {
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.content-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e1e2f;
+}
+
+/* ========================== TABLAS ========================== */
+.table {
+  font-size: 0.95rem;
+  color: #212529;
+}
+
+.table thead {
+  background-color: #727272;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.table thead th {
+  vertical-align: middle;
+  text-align: center;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.table tbody td {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.table tbody tr:hover {
+  background-color: #f0f8ff;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* ========================== BOTONES ========================== */
+.btn-stockmin {
+  background:#ffc107;
+  color:#000;
+  border:none;
+  font-weight:500;
+  border-radius:6px;
+  padding:6px 14px;
+  transition:all .2s ease-in-out;
+}
+
+.btn-stockmin i {
+  margin-right: 4px;
+}
+
+.btn-stockmin:hover {
+  background-color: #e0a800; 
+  color: #000000;
+  transform: translateY(-1px);
+}
+
+.btn-stockmin:active {
+  background-color: #d39e00;
+  transform: translateY(0);
+}
+
+.ctrl select {
+  min-width: 90px;
+}
+
+.btn-group .btn {
+  padding: 4px 10px;
+  font-size: 0.85rem;
+}
+
+.btn-outline-secondary {
+  color: #333;
+  border-color: #ccc;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f1f1f1;
+  color: #000;
+}
+
+/* ============== MODAL: Configurar Stock Mínimo ================== */
+
+/* Contenedor general */
+#modalConfigStockMinimo .modal-content {
+  border: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .18);
+}
+
+/* Header */
+#modalConfigStockMinimo .modal-header-custom {
+  background: linear-gradient(180deg, #070b13);
+  color: #fff;
+  border-bottom: none;
+  padding: .9rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Icono del header */
+#modalConfigStockMinimo .modal-header-custom .modal-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  margin-right: .5rem;
+  font-size: 16px;
+}
+
+/* Botón cerrar (X) */
+#modalConfigStockMinimo .modal-header .close {
+  opacity: .9;
+  text-shadow: none;
+  font-size: 1.4rem;
+}
+#modalConfigStockMinimo .modal-header .close:hover {
+  opacity: 1;
+}
+
+/* Body */
+#modalConfigStockMinimo .modal-body {
+  padding: 1.25rem;
+}
+
+/* Labels y ayudas */
+#modalConfigStockMinimo .form-group label {
+  font-weight: 600;
+  margin-bottom: .4rem;
+}
+#modalConfigStockMinimo .form-text {
+  font-size: .85rem;
+}
+
+/* Inputs grandes con iconos */
+#modalConfigStockMinimo .input-group-lg > .form-control,
+#modalConfigStockMinimo .input-group-lg > .custom-select {
+  height: calc(1.5em + 1.25rem + 2px);
+  font-size: 1rem;
+  padding: .6rem .9rem;
+  border-radius: .6rem;
+  border: 1px solid #dfe3e8;
+  background: #fff;
+}
+#modalConfigStockMinimo .input-group-lg > .input-group-prepend > .input-group-text {
+  padding: .6rem .8rem;
+  font-size: 1rem;
+  background: #eff1f4;
+  border: 1px solid #dfe3e8;
+  color: #3b3f46;
+  border-right: 0;
+  border-radius: .6rem 0 0 .6rem;
+}
+
+/* Focus */
+#modalConfigStockMinimo .custom-select:focus,
+#modalConfigStockMinimo .form-control:focus {
+  border-color: #15161b;
+  box-shadow: 0 0 0 .2rem rgba(21, 22, 27, .15);
+  outline: 0;
+}
+
+/* Footer */
+#modalConfigStockMinimo .modal-footer {
+  border: 0;
+  padding: .75rem 1.25rem 1rem;
+}
+
+/* Botón Guardar */
+#modalConfigStockMinimo .btn-guardar {
+  background: linear-gradient(90deg, #f7c738);
+  border: none;
+  color: #070b13;
+  border-radius: 8px;
+  padding: .55rem 1rem;
+  font-weight: 600;
+  transition: all .2s ease-in-out;
+}
+#modalConfigStockMinimo .btn-guardar:hover {
+  background: linear-gradient(90deg, #fcb911);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(218, 157, 3, .25);
+  color: #fff;
+}
+
+/* Botón Cancelar */
+#modalConfigStockMinimo .btn-cancelar {
+  background: #e5e7eb;
+  color: #374151;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: .55rem 1rem;
+  transition: all .2s ease-in-out;
+}
+#modalConfigStockMinimo .btn-cancelar:hover {
+  background: #d1d5db;
+  color: #111827;
+  transform: translateY(-1px);
+}
+
+/* Ajustes responsivos */
+@media (max-width: 576px){
+  #modalConfigStockMinimo .modal-body{
+    padding: 1rem;
+  }
+  #modalConfigStockMinimo .modal-header-custom{
+    padding: .75rem 1rem;
+  }
+  #modalConfigStockMinimo .modal-header-custom .modal-title{
+    font-size: 1rem;
+  }
+  #modalConfigStockMinimo .input-group-lg > .form-control,
+  #modalConfigStockMinimo .input-group-lg > .custom-select{
+    font-size: .95rem;
+    height: calc(1.5em + 1.1rem + 2px);
+  }
+}
+
+/* Estado de error (opcional, por si valida lado cliente) */
+#modalConfigStockMinimo .is-invalid{
+  border-color: #dc3545 !important;
+}
+#modalConfigStockMinimo .is-invalid:focus{
+  box-shadow: 0 0 0 .2rem rgba(220,53,69,.15) !important;
+}
+
+#modalConfigStockMinimo .modal-header-custom{ background:#111827; border-bottom:none; } /* dark elegante */
+  #modalConfigStockMinimo .modal-title{ font-weight:700; }
+  #modalConfigStockMinimo .rounded-xl{ border-radius:1rem !important; }
+
+  /* Tabla con scroll y encabezado sticky */
+  #modalConfigStockMinimo .tabla-wrap{
+    border:1px solid #e5e7eb; border-radius:.9rem; overflow:auto;
+    max-height: 460px; /* <-- permite bajar para ver más productos */
+    background:#fff;
+  }
+  /* Inputs de la columna MÍN. */
+  #modalConfigStockMinimo .min-input {
+    width: 80px;        /* controla el ancho fijo */
+    text-align: right;  /* número alineado a la derecha */
+    display: inline-block;
+    margin: 0 auto;     /* centrado si quiere */
+    padding-right: .4rem;
+  }
+  #modalConfigStockMinimo thead th{
+    position: sticky; top: 0; z-index: 2;
+    background:#eef2ff; color:#4b5563; font-weight:700; letter-spacing:.03em;
+    border-bottom:1px solid #e5e7eb;
+  }
+  #modalConfigStockMinimo .table td, 
+  #modalConfigStockMinimo .table th{ vertical-align: middle; border-top:1px solid #f1f5f9; }
+  #modalConfigStockMinimo .table tbody tr:hover{ background:#f8fafc; }
+  #modalConfigStockMinimo tr.seleccionado{ background:#e0ecff !important; }
+  #modalConfigStockMinimo .font-mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace; }
+
+  /* Celda de nombre multi-línea con buen leading */
+  #modalConfigStockMinimo .nombre-celda{ line-height:1.25; }
+
+  /* Botones */
+  #modalConfigStockMinimo .btn-guardar{
+    background:#facc15; color:#111827; border:none; border-radius:.7rem; padding:.6rem 1.1rem; font-weight:700;
+  }
+  #modalConfigStockMinimo .btn-guardar[disabled]{ opacity:.6; cursor:not-allowed; }
+  #modalConfigStockMinimo .btn-guardar:not([disabled]):hover{ filter:brightness(0.97); }
+  #modalConfigStockMinimo .btn-cancelar{
+    background:#f3f4f6; color:#111827; border:1px solid #e5e7eb; border-radius:.7rem; padding:.6rem 1.1rem; font-weight:600;
+  }
+  #modalConfigStockMinimo .btn-aplicar{
+    background:#111827; color:#fff; border:none; border-radius:.5rem; padding:.4rem .8rem; font-weight:600;
+  }
+  #modalConfigStockMinimo .btn-aplicar[disabled]{ opacity:.5; cursor:not-allowed; }
+
+  /* Inputs */
+  #modalConfigStockMinimo .form-control:focus{ box-shadow:none; border-color:#111827; }
+  #modalConfigStockMinimo #buscarProductoTabla::placeholder{ color:#9ca3af; }
+
+/* vistas/css/inventario.css */
+#buscadorInventarioWrap .form-control:focus {
+  box-shadow: none;
+  border-color: #80bdff;
+}
+#buscadorInventarioWrap .input-group-text {
+  background-color: #fff;
+  cursor: pointer;
+}
+
+/* ---------- Filtros ---------- */
+.toolbar-inventario {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Labels */
+.toolbar-inventario label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #444;
+  margin-right: 6px;
+  display: inline-block;
+}
+
+/* Selects */
+.toolbar-inventario select {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #333;
+  transition: all 0.2s ease-in-out;
+  min-width: 150px;
+}
+
+.toolbar-inventario select:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 0.15rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+.toolbar-inventario select:hover {
+  border-color: #888;
+}
+
+/* Botones */
+.toolbar-inventario .btn {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  padding: 5px 12px;
+  transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.toolbar-inventario .btn-outline-secondary:hover {
+  background-color: #4a90e2;
+  border-color: #4a90e2;
+  color: #fff;
+}
+
+/* ========================== RESPONSIVE ========================== */
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.85rem;
+  }
+
+  .content-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .card-body {
+    padding: 1rem 0.5rem;
+  }
+}
+
+/* Estilo general tabla de inventario */
+.tabla-inventario {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.tabla-inventario thead th {
+  background-color: #727272;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: .5px;
+  border: none;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.tabla-inventario tbody tr {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  border-radius: 10px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.tabla-inventario tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.08);
+}
+
+.tabla-inventario tbody td {
+  border: none;
+  padding: 12px 14px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* Bordes redondeados */
+.tabla-inventario tbody td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.tabla-inventario tbody td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* Columna cantidad destacada */
+.tabla-inventario td:nth-child(7) {
+  font-weight: 600;
+  color: #1f2937
+}
+
+/* Stock mínimo con alerta */
+.tabla-inventario td:nth-child(12) {
+  font-weight: 600;
+  color: #dc2626; /* rojo */
+}
+
+/* Imagen fija */
+.tabla-inventario td img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/*============== BOTÓN TABLA ==============*/
+/* Contenedor de la paginación */
+.dataTables_wrapper .dataTables_paginate {
+  display: flex;
+  gap: .5rem;
+  justify-content: center;  /* céntralo, cámbialo a flex-end si quieres alineado a la derecha */
+  margin-top: 1rem;
+}
+
+/* Botones base */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background: #fff;
+  color: #374151 !important; /* gris oscuro */
+  border: 1px solid #d1d5db;
+  padding: .45rem .9rem;
+  font-size: .9rem;
+  border-radius: .5rem;
+  transition: all .2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,.05);
+}
+
+/* Hover */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #050505;  
+  color: #ffffff !important;
+  border-color: #050505;;
+  box-shadow: 0 4px 8px rgba(0,0,0,.12);
+}
+
+/* Página actual */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #050505; 
+  color: #ffffff !important;
+  font-weight: 600;
+  border-color: #050505; 
+  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+}
+
+/* Botones deshabilitados */
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  background: #f3f4f6;
+  color: #9ca3af !important;
+  border-color: #e5e7eb;
+  box-shadow: none;
+  cursor: not-allowed;
+}
