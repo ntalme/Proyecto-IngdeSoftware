@@ -549,3 +549,166 @@ document.addEventListener('DOMContentLoaded', function () {
   if (chk && btn) btn.disabled = !chk.checked;
   if (chk && btn) chk.addEventListener('change', () => { btn.disabled = !chk.checked; });
 });
+
+// ---------------------------- CIERRE DE CAJA ----------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  const inputBoletas = document.getElementById("montoBoletasDigitales");
+  const spanRetencionBoletas = document.getElementById("retencionBoletasDigitales");
+  const totalGeneralElem = document.getElementById("totalGeneral");
+  const totalFinalElem = document.getElementById("totalFinal");
+  const gananciaDiaElem = document.getElementById("gananciaDia");
+  const reinvLocalElem = document.getElementById("reinvLocal");
+  const chkConfirma = document.getElementById("chkConfirmaCierre");
+  const btnConfirmar = document.getElementById("btnConfirmarCierre");
+
+  // Elementos opcionales (solo domingo)
+  const filaDescuentoLuz = document.getElementById("filaDescuentoLuz");
+  const montoDescuentoLuzElem = document.getElementById("montoDescuentoLuz");
+  const montoReinversionSemanalElem = document.getElementById("montoReinversionSemanal");
+  const montoReinversionSemanalFinalElem = document.getElementById("montoReinversionSemanalFinal");
+
+  const esDomingo = !!filaDescuentoLuz;
+
+  const reinversionSemanalBase = montoReinversionSemanalElem
+    ? parseMonto(montoReinversionSemanalElem.textContent)
+    : 0;
+
+  // ---------------- FUNCIONES AUXILIARES ----------------
+  function parseMonto(texto) {
+    if (!texto) return 0;
+    // Detectar si hay signo negativo en el texto
+    const esNegativo = texto.includes("-");
+    // Extraer solo los números y convertirlos a float
+    const valor = parseFloat(texto.replace(/[^0-9,]+/g, "").replace(",", ".")) || 0;
+    // Si hay "-", devolverlo como negativo
+    return esNegativo ? -valor : valor;
+  }
+
+  const formatoCLP = new Intl.NumberFormat("es-CL", {
+    style: "currency",
+    currency: "CLP",
+    minimumFractionDigits: 0,
+  });
+
+  function obtenerRetencionTarjeta() {
+    const elem = document.getElementById("retencionTarjeta");
+    return elem ? parseMonto(elem.textContent) : 0;
+  }
+
+  // ---------------- FUNCIÓN CENTRAL ----------------
+  function recalcularCierre() {
+    // Valor de boletas digitales
+    const boletas = inputBoletas?.value.trim() === "" ? 0 : parseFloat(inputBoletas.value) || 0;
+    const retencionBoletas = boletas > 0 ? boletas * 0.2 : 0;
+
+    // Actualiza visualmente la retención de boletas digitales
+    if (spanRetencionBoletas)
+      spanRetencionBoletas.textContent =
+        retencionBoletas > 0 ? "-" + formatoCLP.format(retencionBoletas) : "-$0";
+
+    const totalGeneral = parseMonto(totalGeneralElem.textContent);
+    const retencionTarjeta = obtenerRetencionTarjeta();
+    const descuentoContadora = 5000;
+    const descuentoLuz =
+      esDomingo && montoDescuentoLuzElem ? parseMonto(montoDescuentoLuzElem.textContent) : 0;
+
+    // Normalizar valores para evitar sumar negativos
+    const retencionBoletasPos = Math.abs(retencionBoletas);
+    const retencionTarjetaPos = Math.abs(retencionTarjeta);
+
+    // Cálculo correcto del total final
+    let totalFinal =
+      totalGeneral - retencionBoletasPos - retencionTarjetaPos - descuentoContadora;
+    totalFinal = Math.max(totalFinal, 0);
+    totalFinalElem.textContent = formatoCLP.format(totalFinal);
+
+    // Ganancia (20%) y reinversión diaria (80%)
+    const ganancia = totalFinal * 0.2;
+    const reinversionDia = totalFinal * 0.8;
+    gananciaDiaElem.textContent = formatoCLP.format(ganancia);
+    reinvLocalElem.textContent = formatoCLP.format(reinversionDia);
+
+    // Solo recalcular reinversión semanal si es domingo
+    if (esDomingo && montoReinversionSemanalElem) {
+      const reinversionSemanalActualizada = reinversionSemanalBase + reinversionDia;
+
+      // Forzar el descuento a positivo (para que siempre reste)
+      const descuentoLuzValor = Math.abs(
+        parseMonto(montoDescuentoLuzElem?.textContent || "0")
+      );
+
+      const reinversionSemanalFinal = Math.max(
+        reinversionSemanalActualizada - descuentoLuzValor,
+        0
+      );
+
+      montoReinversionSemanalElem.textContent = formatoCLP.format(
+        reinversionSemanalActualizada
+      );
+
+      if (montoReinversionSemanalFinalElem)
+        montoReinversionSemanalFinalElem.textContent = formatoCLP.format(
+          reinversionSemanalFinal
+        );
+    }
+  }
+
+  // ---------------- INICIALIZACIÓN ----------------
+  recalcularCierre();
+  if (inputBoletas) inputBoletas.addEventListener("input", recalcularCierre);
+
+  if (chkConfirma && btnConfirmar)
+    chkConfirma.addEventListener("change", () => {
+      btnConfirmar.disabled = !chkConfirma.checked;
+    });
+
+  // Colores visuales
+  if (filaDescuentoLuz) filaDescuentoLuz.style.backgroundColor = "#fff3cd";
+  if (montoReinversionSemanalElem)
+    montoReinversionSemanalElem.closest("tr").style.backgroundColor = "#e3f2fd";
+
+  // Ocultar reinversión semanal si no es domingo
+  if (!esDomingo && montoReinversionSemanalElem)
+    montoReinversionSemanalElem.closest("tr").style.display = "none";
+});
+
+$('#modalResumenMetodoPago').on('shown.bs.modal', function () {
+  $.ajax({
+    url: "../ajax/ventas.ajax.php",
+    method: "POST",
+    data: { accion: "resumen_metodo_pago" },
+    dataType: "json",
+    success: function(respuesta) {
+      console.log("Respuesta AJAX:", respuesta); // 🔍 Ver en consola
+      if (respuesta.error) {
+        $("#tablaResumenMetodoPago").html(`<tr><td colspan='3'>${respuesta.error}</td></tr>`);
+        return;
+      }
+      let html = "";
+      let totalGeneral = 0;
+      if (respuesta.length === 0) {
+        html = "<tr><td colspan='3'>No hay ventas registradas hoy.</td></tr>";
+      } else {
+        respuesta.forEach(r => {
+          totalGeneral += parseFloat(r.monto_total);
+          html += `
+            <tr>
+              <td>${r.metodo_pago}</td>
+              <td>${r.cantidad_ventas}</td>
+              <td>$${parseFloat(r.monto_total).toLocaleString()}</td>
+            </tr>`;
+        });
+        html += `
+          <tr class="font-weight-bold bg-light">
+            <td colspan="2">TOTAL GENERAL</td>
+            <td>$${totalGeneral.toLocaleString()}</td>
+          </tr>`;
+      }
+      $("#tablaResumenMetodoPago").html(html);
+    },
+    error: function(xhr, status, error) {
+      $("#tablaResumenMetodoPago").html(`<tr><td colspan='3'>Error: ${error}</td></tr>`);
+      console.error("Error AJAX:", xhr.responseText);
+    }
+  });
+});

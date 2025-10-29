@@ -32,93 +32,46 @@ body {
   margin: 0 0 .4rem 0 !important;
 }
 
-/* ----------------  Botón "Ver ventas"---------------- */
-.btn-ver-ventas{
-  background: linear-gradient(90deg, #f7c738);
-  color: #000000;             
+/* ----------------  Botón "Ver ventas" y "Ver Resumen" ---------------- */
+/* Botones del grupo de acciones en la tabla de cierres */
+.btn-group .btn {
   border: none;
   border-radius: 8px;
-  padding: .35rem .55rem;       
-  transition: transform .9s ease, box-shadow .2s ease, background .2s ease;
-}
-.btn-ver-ventas:hover{
-  background: linear-gradient(90deg, #dbac1f);
-  transform: translateY(-1px) scale(1.03);
-  box-shadow: 0 6px 14px rgba(218,157,3,.25);
-}
-.btn-ver-ventas:active{
-  transform: scale(.98);
-  box-shadow: none;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 6px;
+  transition: all 0.2s ease;
 }
 
-/* ---------------- Modal General ---------------- */
-.modal-elegante {
-  border-radius: 12px;
-  overflow: hidden;
-  border: none;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+/* 🔸 Botón Ver Ventas (ojo) */
+.btn-ver-ventas {
+  background-color: #ffcc00;
+  color: #000;
+}
+.btn-ver-ventas:hover {
+  background-color: #e6b800;
+  color: #000;
+  transform: scale(1.05);
 }
 
-.modal-header {
-  border-bottom: none;
-  padding: 1rem 1.5rem;
+/* 🔸 Botón Ver Resumen (gráfico circular) */
+.btn-ver-resumen {
+  background-color: #ffcc00;
+  color: #000;
+}
+.btn-ver-resumen:hover {
+  background-color: #e6b800;
+  color: #000;
+  transform: scale(1.05);
 }
 
-.modal-body {
-  background-color: #f9fafc;
-  padding: 1.5rem;
+/* Íconos */
+.btn-group .btn i {
+  font-size: 16px;
 }
-
-.modal-footer {
-  background-color: #f1f3f6;
-  border-top: none;
-}
-
-/* ---------------- Modal Personalizado ---------------- */
-/* Header */
-.modal-header-custom {
-  background: linear-gradient(135deg, #070b13);
-  color: #fff;
-  border-bottom: none;
-  padding: 1rem 1.5rem;
-}
-
-.modal-header-custom .modal-title i {
-  color: #ffffff;
-}
-
-/* Body */
-.modal-body-custom {
-  background-color: #f9fbfd;
-  padding: 1.5rem;
-}
-
-/* Footer */
-.modal-footer-custom {
-  background-color: #f1f4f7;
-  border-top: none;
-}
-
-/* Alerta personalizada */
-.alert-custom {
-  background-color: #f7c738;
-  border: 1px solid #ffffff;
-  color: #070b13;
-  font-weight: 500;
-  border-radius: .5rem;
-}
-
-/* Encabezado de tabla en modal */
-.thead-custom {
-  background: #070b13;
-  color: #fff;
-}
-
-/* Hover de filas en modal */
-.table-hover tbody tr:hover {
-  background-color: #eef6ff;
-}
-
 
 /* ---------------- Tabla ---------------- */
 .table-cierres {
@@ -176,7 +129,7 @@ body {
 .table-cierres td.col-total {
   font-weight: 700;
   font-size: 15px;
-  color: #2563eb;  /* azul */
+  color: #ebcd25;  /* azul */
 }
 .table-cierres td.col-observaciones {
   font-style: italic;
@@ -245,4 +198,347 @@ body {
   border-color: #e5e7eb;
   box-shadow: none;
   cursor: not-allowed;
+}
+
+
+/* ==========================================================
+   MODAL: DETALLE DE VENTAS — Diseño Elegante y Profesional
+   ========================================================== */
+
+.modal-elegante {
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  font-family: 'Poppins', sans-serif;
+}
+
+/* HEADER */
+.modal-header-custom {
+  background-color: #000;
+  color: #fff;
+  padding: 18px 24px;
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header-custom h5 {
+  font-weight: 600;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-header-custom i {
+  color: #ffcc00;
+}
+
+.modal-header-custom .close {
+  color: #fff;
+  font-size: 22px;
+  opacity: 0.85;
+  transition: 0.2s ease;
+}
+.modal-header-custom .close:hover {
+  opacity: 1;
+}
+
+/* BODY */
+.modal-body-custom {
+  padding: 25px 30px;
+  background: #fafafa;
+}
+
+/* ALERTA INFORMATIVA */
+.alert-info {
+  background: #dacb00;
+  border: 1px solid #f0cc00;
+  color: #000000;
+  border-radius: 8px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+}
+
+.alert-info i {
+  color: #000000;
+  margin-right: 6px;
+}
+
+/* TABLA */
+#tablaVentas {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  font-size: 14px;
+}
+
+#tablaVentas thead.thead-custom {
+  background-color: #000;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}
+
+#tablaVentas th,
+#tablaVentas td {
+  vertical-align: middle;
+  padding: 10px;
+}
+
+#tablaVentas tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+#tablaVentas tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* BORDES Y EFECTOS */
+#tablaVentas.table-bordered th,
+#tablaVentas.table-bordered td {
+  border: 1px solid #e5e5e5;
+}
+
+/* CELDAS */
+#tablaVentas td {
+  color: #333;
+  font-weight: 500;
+  word-break: break-word;
+  white-space: normal;
+}
+
+/* ID y TOTAL destacados */
+#tablaVentas td:first-child {
+  color: #000;
+  font-weight: 600;
+}
+
+#tablaVentas td:nth-child(3) {
+  color: #000000;
+  font-weight: 600;
+}
+
+/* SCROLL Y RESPONSIVE */
+.table-responsive {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* FOOTER */
+.modal-footer-custom {
+  background: #f0f0f0;
+  border-top: 1px solid #ddd;
+  padding: 16px 22px;
+  display: flex;
+  justify-content: flex-end;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+/* BOTÓN */
+.modal-footer-custom .btn-secondary {
+  background-color: #000;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 25px;
+  padding: 8px 18px;
+  transition: 0.2s;
+}
+
+.modal-footer-custom .btn-secondary i {
+  color: #ffcc00;
+}
+
+.modal-footer-custom .btn-secondary:hover {
+  background-color: #333;
+  transform: scale(1.05);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .modal-body-custom {
+    padding: 20px 15px;
+  }
+  #tablaVentas th, #tablaVentas td {
+    font-size: 13px;
+    padding: 8px;
+  }
+}
+
+
+/* ==========================================================
+   MODAL: RESUMEN DIARIO DEL CIERRE — Diseño Moderno
+   ========================================================== */
+
+.resumen-cuadros {
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  background: #ffffff;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* HEADER */
+.resumen-header {
+  background-color: #000000;
+  color: #fff;
+  border-bottom: none;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.resumen-header .modal-title {
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.resumen-header .modal-title i {
+  color: #ffcc00;
+  font-size: 19px;
+}
+
+.resumen-header .close {
+  opacity: 0.8;
+  font-size: 22px;
+  transition: 0.3s;
+}
+.resumen-header .close:hover {
+  opacity: 1;
+}
+
+/* BODY */
+.resumen-body {
+  background: #f9f9f9;
+  padding: 30px;
+}
+
+.resumen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+/* Tarjetas */
+.resumen-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 18px 16px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #eee;
+}
+
+.resumen-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Ícono */
+.resumen-card .icono {
+  background-color: #000;
+  color: #ffffff;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px auto;
+  font-size: 18px;
+  transition: background-color 0.3s ease;
+}
+
+/* Texto */
+.resumen-card h6 {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.resumen-card .monto {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+/* Colores destacados */
+.resumen-card.ganancia-dia .monto {
+  color: #000000;
+}
+.resumen-card.reinversion .monto {
+  color: #000000;
+}
+.resumen-card.total-final .monto {
+  color: #000000;
+}
+.resumen-card.retencion-boletas .monto,
+.resumen-card.retencion-tarjeta .monto,
+.resumen-card.descuento-contadora .monto {
+  color: #f01800;
+}
+
+/* FOOTER */
+.resumen-footer {
+  background: #f0f0f0;
+  border-top: 1px solid #ddd;
+  padding: 16px 22px;
+  display: flex;
+  justify-content: flex-end;
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 14px;
+}
+
+/* Botón */
+.resumen-footer .btn-light {
+  background-color: #000;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  border-radius: 25px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.resumen-footer .btn-light i {
+  color: #ffffff;
+}
+
+.resumen-footer .btn-light:hover {
+  background-color: #333;
+  transform: scale(1.05);
+}
+
+/* Ajuste responsive */
+@media (max-width: 576px) {
+  .resumen-body {
+    padding: 20px 15px;
+  }
+  .resumen-grid {
+    gap: 14px;
+  }
+  .resumen-card {
+    padding: 16px 12px;
+  }
 }

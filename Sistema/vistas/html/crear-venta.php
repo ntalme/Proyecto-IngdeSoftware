@@ -351,12 +351,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'cerra
   </section>
 </div>
 
-<!--------------------- MODAL: CIERRE CAJA ------------------------>
+<!--------------------- MODAL: CIERRE DE CAJA ------------------------>
 <div class="modal fade" id="modalCierreCaja" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-     <form method="POST" action="index.php?ruta=crear-venta" id="formCierreCaja" class="modal-content cierre-modal">
+    <form method="POST" action="index.php?ruta=crear-venta" id="formCierreCaja" class="modal-content cierre-modal">
 
-      <!-- Header -->
+      <!-- HEADER -->
       <div class="modal-header cierre-header">
         <div class="d-flex align-items-center">
           <div class="cierre-icon mr-2"><i class="fas fa-cash-register"></i></div>
@@ -370,31 +370,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'cerra
         </button>
       </div>
 
-      <!-- Body -->
+      <!-- BODY -->
       <div class="modal-body">
         <?php
-          // Datos para el resumen (ajustado a sus tablas singulares)
           $totalHoy    = ControladorVentas::ctrObtenerTotalDelDia();
           $cantidadHoy = ControladorVentas::ctrObtenerCantidadDelDia();
 
-          // Fecha y usuario (opcional, según su sesión)
           $tz = new DateTimeZone('America/Santiago');
-          $hoyCL = (new DateTime('now', $tz))->format('d-m-Y');
+          $hoy = new DateTime('now', $tz);
+          $hoyCL = $hoy->format('d-m-Y');
           $nombreUsuario = isset($_SESSION['nombre']) ? $_SESSION['nombre'] : ('Usuario #'.(int)($_SESSION['id'] ?? 0));
+
+          $esDomingo = ($hoy->format('w') == 0); // 0 = domingo
+          $descuentoLuz = $esDomingo ? 80000 : 0;
+
+          // Obtener reinversión semanal acumulada
+          $reinversionSemanal = ControladorVentas::ctrCalcularReinversionSemanal();
+          $reinversionSemanalFinal = $esDomingo ? max($reinversionSemanal - $descuentoLuz, 0) : $reinversionSemanal;
         ?>
 
-        <!-- AVISO: solo 1 cierre por día -->
+        <!-- AVISO -->
         <div class="alert alert-warning d-flex align-items-center mb-3" role="alert">
           <i class="fas fa-lock mr-2"></i>
           <div>
-            <strong>Importante:</strong> el cierre de caja se puede realizar <u>solo una vez por día</u>. 
+            <strong>Importante:</strong> solo se puede realizar un cierre por día.
+            <?php if ($esDomingo): ?>
+              <br><span class="text-danger font-weight-bold">Hoy es domingo — se descontarán $80.000 de la reinversión semanal por pago de luz.</span>
+            <?php endif; ?>
           </div>
         </div>
 
-        <!-- KPI Cards -->
+        <!-- KPI CARDS -->
         <div class="row">
           <div class="col-md-4 mb-3">
-            <div class="card shadow-sm kpi-card">
+            <div class="card kpi-card shadow-sm">
               <div class="card-body">
                 <div class="kpi-label">Fecha</div>
                 <div class="kpi-value"><?= htmlspecialchars($hoyCL) ?></div>
@@ -402,63 +411,197 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'cerra
             </div>
           </div>
           <div class="col-md-4 mb-3">
-            <div class="card shadow-sm kpi-card">
+            <div class="card kpi-card shadow-sm">
               <div class="card-body">
-                <div class="kpi-label">Total ventas del día</div>
-                <div class="kpi-value">$<?= number_format((float)$totalHoy, 2, ',', '.') ?></div>
+                <div class="kpi-label">Total Ventas del Día</div>
+                <div class="kpi-value">$<?= number_format((float)$totalHoy, 0, ',', '.') ?></div>
               </div>
             </div>
           </div>
           <div class="col-md-4 mb-3">
-            <div class="card shadow-sm kpi-card">
+            <div class="card kpi-card shadow-sm">
               <div class="card-body">
-                <div class="kpi-label">Cantidad de ventas</div>
+                <div class="kpi-label">Cantidad de Ventas</div>
                 <div class="kpi-value"><?= (int)$cantidadHoy ?></div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Detalle contextual -->
+        <!-- USUARIO -->
         <div class="card shadow-sm mb-3">
           <div class="card-body py-3">
-            <div class="d-flex align-items-center justify-content-between flex-wrap">
-              <div class="mb-2">
-                <span class="text-muted d-block" style="line-height:1;">Usuario responsable</span>
-                <strong><?= htmlspecialchars($nombreUsuario) ?></strong>
+            <span class="text-muted d-block" style="line-height:1;">Usuario responsable</span>
+            <strong><?= htmlspecialchars($nombreUsuario) ?></strong>
+          </div>
+        </div>
+
+        <!-- TABLA RESUMEN -->
+        <div class="card shadow-sm mb-3">
+          <div class="card-body p-0">
+            <table class="table table-striped mb-0 text-center align-middle resumen-tabla">
+              <thead>
+                <tr>
+                  <th>Método de Pago</th>
+                  <th>Cantidad</th>
+                  <th>Monto Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php
+                  $totales = ControladorVentas::ctrResumenMetodoPagoDirecto();
+                  $retencionData = ControladorVentas::ctrCalcularRetencion();
+                  $totalGeneral = 0;
+
+                  if (empty($totales)) {
+                      echo "<tr><td colspan='3'>No hay ventas registradas hoy.</td></tr>";
+                  } elseif (isset($totales[0]['error'])) {
+                      echo "<tr><td colspan='3'>Error: {$totales[0]['error']}</td></tr>";
+                  } else {
+                      foreach ($totales as $fila) {
+                          $totalGeneral += $fila['monto_total'];
+                          echo "
+                          <tr>
+                            <td>{$fila['metodo_pago']}</td>
+                            <td>{$fila['cantidad_ventas']}</td>
+                            <td>$" . number_format($fila['monto_total'], 0, ',', '.') . "</td>
+                          </tr>";
+                      }
+
+                      echo "
+                      <tr class='resumen-total-general'>
+                        <td colspan='2'>TOTAL GENERAL</td>
+                        <td id='totalGeneral'>$" . number_format($totalGeneral, 0, ',', '.') . "</td>
+                      </tr>";
+                  }
+                ?>
+
+                <!-- RETENCIONES Y AJUSTES -->
+                <tr class="resumen-subtitulo">
+                  <td colspan="3">RETENCIONES Y AJUSTES</td>
+                </tr>
+
+                <tr class="resumen-boletas">
+                  <td colspan="2"><strong>Boletas Digitales</strong></td>
+                  <td>
+                    <input 
+                      type="number" 
+                      id="montoBoletasDigitales" 
+                      name="montoBoletasDigitales"
+                      class="form-control form-control-sm text-center resumen-input" 
+                      placeholder="Ingrese monto" 
+                      min="0"
+                    >
+                  </td>
+                </tr>
+
+                <tr>
+                  <td colspan="2"><strong>Retención 20% (Boletas Digitales)</strong></td>
+                  <td><span id="retencionBoletasDigitales" class="text-danger">-$0</span></td>
+                </tr>
+                <tr>
+                  <td colspan="2"><strong>Retención 20% (Ventas con Tarjeta)</strong></td>
+                  <td><span id="retencionTarjeta" class="text-danger">-$<?= number_format($retencionData['retencion'], 0, ',', '.'); ?></span></td>
+                </tr>
+
+                <?php $descuentoContadora = 5000; ?>
+                <tr>
+                  <td colspan="2"><strong>Descuento Contadora</strong></td>
+                  <td><span class="text-danger">-$<?= number_format($descuentoContadora, 0, ',', '.'); ?></span></td>
+                </tr>
+
+                <?php 
+                  $totalFinal = max($totalGeneral - $retencionData['retencion'] - $descuentoContadora, 0);
+                ?>
+                <tr class="resumen-total-final">
+                  <td colspan="2">TOTAL FINAL DEL DÍA</td>
+                  <td id="totalFinal">$<?= number_format($totalFinal, 0, ',', '.'); ?></td>
+                </tr>
+
+                <!-- REINVERSIÓN SEMANAL -->
+                  <tr class="table-info font-weight-bold">
+                    <td colspan="2">Reinversión Semanal Acumulada</td>
+                    <!-- Se agrega el id para que el JS pueda actualizar este valor -->
+                    <td id="montoReinversionSemanal">$<?= number_format($reinversionSemanal, 0, ',', '.'); ?></td>
+                  </tr>
+
+                  <?php if ($esDomingo): ?>
+                    <tr class="table-warning font-weight-bold" id="filaDescuentoLuz">
+                      <td colspan="2">Descuento Luz (Domingo)</td>
+                      <!-- Se agrega id y text-danger dentro del td -->
+                      <td id="montoDescuentoLuz" class="text-danger">-$<?= number_format($descuentoLuz, 0, ',', '.'); ?></td>
+                    </tr>
+
+                    <tr class="font-weight-bold">
+                      <td colspan="2">Reinversión Semanal Final</td>
+                      <!-- Se agrega id para actualizar dinámicamente -->
+                      <td id="montoReinversionSemanalFinal">$<?= number_format($reinversionSemanalFinal, 0, ',', '.'); ?></td>
+                    </tr>
+                  <?php endif; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- BLOQUE FINAL -->
+        <div class="row text-center mt-3">
+          <div class="col-md-6 mb-3">
+            <div class="card kpi-card shadow-sm">
+              <div class="card-body">
+                <div class="kpi-label">Ganancia del Día (20%)</div>
+                <div class="kpi-value" id="gananciaDia">
+                  $<?= number_format($totalFinal * 0.20, 0, ',', '.'); ?>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <?php 
+            $reinversionDia = $totalFinal * 0.80;
+          ?>
+          <div class="col-md-6 mb-3">
+            <div class="card kpi-card shadow-sm">
+              <div class="card-body">
+                <div class="kpi-label">Reinversión del Día (80%)</div>
+                <div class="kpi-value" id="reinvLocal">
+                  $<?= number_format($reinversionDia, 0, ',', '.'); ?>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Observaciones -->
-        <div class="form-group">
-          <label class="mb-1 font-weight-600">Observaciones (opcional)</label>
-          <textarea name="observaciones" class="form-control" rows="3" placeholder="Notas internas del cierre, incidencias, arqueo, etc."></textarea>
-          <small class="form-text text-muted">Estas observaciones quedarán registradas en <em>Cierre Caja Observaciones</em>.</small>
+        <!-- OBSERVACIONES -->
+        <div class="form-group mt-3">
+          <label class="mb-1 font-weight-600">Observaciones</label>
+          <textarea name="observaciones" class="form-control" rows="3"><?= $esDomingo ? "Se aplicó descuento dominical de $80.000 por pago de luz (restado de la reinversión semanal)." : "" ?></textarea>
         </div>
 
-        <!-- Confirmación -->
+        <!-- CONFIRMACIÓN -->
         <div class="custom-control custom-checkbox mt-2">
           <input type="checkbox" class="custom-control-input" id="chkConfirmaCierre" name="chkConfirmaCierre" value="1">
           <label class="custom-control-label" for="chkConfirmaCierre">
-            Declaro que revisé la información y deseo confirmar el cierre de la jornada.
+            Declaro que revisé la información y deseo confirmar el cierre diario.
           </label>
         </div>
       </div>
 
-      <!-- Footer -->
+      <!-- FOOTER -->
       <div class="modal-footer d-flex align-items-center justify-content-between">
         <div class="text-muted small">
           <i class="far fa-shield-check mr-1"></i>
-          Al confirmar, se guardará un registro en <code>Cierre Caja</code>.
+          Al confirmar, se guardará un registro en <code>cierre_caja</code>.
         </div>
 
         <div>
           <input type="hidden" name="accion" value="cerrarCaja">
-          <button type="button" class="btn btn-cancelar" data-dismiss="modal">
-            Cancelar
-          </button>
+          <input type="hidden" name="total_general" value="<?= $totalGeneral ?>">
+          <input type="hidden" name="total_final" value="<?= $totalFinal ?>">
+          <input type="hidden" name="es_domingo" value="<?= $esDomingo ? 1 : 0 ?>">
+          <input type="hidden" name="descuento_luz" value="<?= $descuentoLuz ?>">
+          <input type="hidden" name="reinversion_semana" value="<?= $reinversionSemanal ?>">
+          <input type="hidden" name="reinversion_semana_final" value="<?= $reinversionSemanalFinal ?>">
+          <button type="button" class="btn btn-cancelar" data-dismiss="modal">Cancelar</button>
           <button type="submit" id="btnConfirmarCierre" class="btn btn-cierre ml-2" disabled>
             <i class="fas fa-check mr-1"></i> Confirmar Cierre
           </button>
@@ -467,6 +610,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'cerra
     </form>
   </div>
 </div>
+
+<!-- SCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const inputMonto = document.getElementById("montoBoletasDigitales");
+  const cellRetencion = document.getElementById("retencionBoletasDigitales");
+  const totalFinalCell = document.getElementById("totalFinal");
+  const gananciaDiaCell = document.getElementById("gananciaDia");
+  const reinvLocalCell = document.getElementById("reinvLocal");
+
+  const totalGeneral = parseFloat(
+    document.getElementById("totalGeneral").textContent.replace(/\./g, '').replace('$','').trim()
+  ) || 0;
+
+  const retencionTarjeta = <?php echo json_encode($retencionData['retencion']); ?>;
+  const descuentoContadora = <?php echo json_encode($descuentoContadora); ?>;
+
+  inputMonto.addEventListener("input", () => {
+    const monto = parseFloat(inputMonto.value) || 0;
+    const retencionDigital = monto * 0.20;
+    const totalFinal = totalGeneral - retencionTarjeta - descuentoContadora - retencionDigital;
+
+    const ganancia = totalFinal * 0.20;
+    const reinversion = totalFinal * 0.80;
+
+    cellRetencion.innerHTML = `<span class="text-danger">-$${retencionDigital.toLocaleString("es-CL", { minimumFractionDigits: 0 })}</span>`;
+    totalFinalCell.textContent = "$" + totalFinal.toLocaleString("es-CL", { minimumFractionDigits: 0 });
+    gananciaDiaCell.textContent = "$" + ganancia.toLocaleString("es-CL", { minimumFractionDigits: 0 });
+    reinvLocalCell.textContent = "$" + reinversion.toLocaleString("es-CL", { minimumFractionDigits: 0 });
+  });
+});
+</script>
 
 <!-- JS -->
 <script src="vistas/js/crear-venta.js"></script>

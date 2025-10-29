@@ -230,13 +230,29 @@ class ControladorVentas {
         $rows .= '<tr><td colspan="7" class="text-center" style="color:#777;padding:14px">Sin detalle</td></tr>';
     } else {
         foreach ($detalle as $d) {
-            $producto = htmlspecialchars((string)($d['producto'] ?? 'Producto'));
+            // ====== NUEVA LÓGICA DE PRECIOS (usa los valores guardados en la venta) ======
+            $producto = htmlspecialchars((string)($d['producto'] ?? $d['nombre'] ?? 'Producto'));
             $marca    = htmlspecialchars((string)($d['marca'] ?? '-'));
             $formato  = htmlspecialchars((string)($d['formato'] ?? '-'));
             $tamano   = htmlspecialchars((string)($d['tamano'] ?? '-'));
             $cant     = (float)($d['cantidad'] ?? 0);
-            $precio   = (float)($d['precio'] ?? 0);
-            $subtotal = (float)($d['subtotal'] ?? ($cant * $precio));
+
+            // 👉 aquí usamos los valores históricos guardados en la venta:
+            if (isset($d['precio_final'])) {
+                $precio = (float)$d['precio_final'];      
+            } elseif (isset($d['precio_base'])) {
+                $precio = (float)$d['precio_base'];
+            } else {
+                $precio = (float)($d['precio'] ?? 0);
+            }
+
+            // el subtotal también lo tomamos del JSON si existe
+            if (isset($d['total_linea'])) {
+                $subtotal = (float)$d['total_linea'];
+            } else {
+                $subtotal = (float)($d['subtotal'] ?? ($cant * $precio));
+            }
+
             $idProd   = $d['id_producto'] ?? ($d['producto_id'] ?? ($d['id'] ?? null));
 
             // Promos que aplican a esta línea
@@ -390,7 +406,7 @@ class ControladorVentas {
       <div class="resumen">
         <table>
           <tr>
-            <td>Neto (sin descuento)</td>
+            <td>Neto</td>
             <td class="text-right">$'.number_format($netoSinDesc, 0, ",", ".").'</td>
           </tr>'.
           ($aplicaIVA ? '
@@ -398,11 +414,6 @@ class ControladorVentas {
             <td>IVA (19%)</td>
             <td class="text-right">$'.number_format($ivaSinDesc, 0, ",", ".").'</td>
           </tr>' : '').'
-          '. ($descuentoTotal > 0 ? '
-          <tr>
-            <td>Descuento</td>
-            <td class="text-right">-$'.number_format($descuentoTotal, 0, ",", ".").'</td>
-          </tr>' : '') .'
           <tr class="total">
             <td>Total</td>
             <td class="text-right">$'.number_format($total, 0, ",", ".").'</td>
@@ -415,8 +426,8 @@ class ControladorVentas {
         &nbsp;&nbsp;|&nbsp;&nbsp; Generado: '.htmlspecialchars($fechaHumana).'
       </footer>
 
-    </body>
-    </html>';
+      </body>
+      </html>';
 
     // ====== Dompdf ======
     require_once __DIR__ . "/../vendor/autoload.php";
@@ -492,18 +503,18 @@ class ControladorVentas {
     ];
   }
 
-/* ========================================== CIERRES =================================================== */
-  // ----------------------------  OBTENER TOTAL DEL DIA ----------------------------------------
+/* ========================================== CIERRE =================================================== */
+// ---------------------------- TOTAL DEL DÍA ----------------------------------------
   public static function ctrObtenerTotalDelDia() {
     return ModeloVentas::mdlTotalDelDia();
   }
 
-  // ---------------------------- OBTENER CANTIDAD DEL DIA --------------------------------------
+  // ---------------------------- CANTIDAD DEL DÍA -------------------------------------
   public static function ctrObtenerCantidadDelDia() {
     return ModeloVentas::mdlCantidadDelDia();
   }
 
-  // ---------------------------- CREAR CIERRE --------------------------------------------------
+  // ---------------------------- CREAR CIERRE DIARIO ----------------------------------
   public static function ctrCrearCierre() {
     if (!isset($_POST['accion']) || $_POST['accion'] !== 'cerrarCaja') return;
 
@@ -513,57 +524,140 @@ class ControladorVentas {
     }
 
     $idUsuario = (int)$_SESSION['id'];
-  
-    // NEW: bloquear si ya existe cierre hoy (global; usa true para por-usuario)
-    if (self::ctrExisteCierreHoy(false)) {
+
+    // Evitar doble cierre el mismo día
+    if (ModeloVentas::mdlExisteCierreHoy($idUsuario)) {
       echo '<script>
         Swal.fire({
           icon:"info",
-          title:"Cierre ya realizado",
-          text:"El cierre de caja ya fue registrado hoy. No es posible realizarlo nuevamente."
+          title:"Cierre ya registrado",
+          text:"El cierre de caja del día ya fue realizado."
         });
       </script>';
       return;
     }
 
-    $total    = ModeloVentas::mdlTotalDelDia();
-    $cantidad = ModeloVentas::mdlCantidadDelDia();
+    // Datos base del día
+    $totalGeneral = ModeloVentas::mdlTotalDelDia();
+    $cantidadVentas = ModeloVentas::mdlCantidadDelDia();
 
-    if ($cantidad <= 0 || $total <= 0) {
-      echo '<script>
-        Swal.fire({ icon:"info", title:"No hay ventas para cerrar", text:"No se encontraron ventas en la fecha de hoy." });
-      </script>';
-      return;
-    }
-
-    $ok = ModeloVentas::mdlGuardarCierre($idUsuario, (float)$total, (int)$cantidad);
-
-    if ($ok) {
-      echo '<script>
-        Swal.fire({ icon:"success", title:"Cierre registrado", text:"Se guardó el cierre y se vincularon las ventas del día." })
-        .then(()=>{ window.location="cierre-caja"; });
-      </script>';
-    } else {
-      // Podría ser por carrera (otro cerró justo antes) u otro error
+    if ($cantidadVentas <= 0 || $totalGeneral <= 0) {
       echo '<script>
         Swal.fire({
-          icon:"error",
-          title:"No se pudo cerrar",
-          text:"O bien el cierre ya se registró hoy o ocurrió un error. Refresca la página e intenta nuevamente."
+          icon:"info",
+          title:"No hay ventas para cerrar",
+          text:"No se encontraron ventas registradas hoy."
         });
       </script>';
+      return;
+    }
+
+    // Calcular retenciones y descuentos
+    $boletasDigitales = (float)($_POST['montoBoletasDigitales'] ?? 0);
+    $retencionBoletas = $boletasDigitales * 0.20;
+
+    $totalTarjeta = ModeloVentas::mdlObtenerTotalConTarjeta("venta");
+    $retencionTarjeta = $totalTarjeta * 0.20;
+
+    $descuentoContadora = 5000;
+
+    // Totales finales del día
+    $totalFinal = max($totalGeneral - $retencionBoletas - $retencionTarjeta - $descuentoContadora, 0);
+    $gananciaDia = $totalFinal * 0.20;
+    $reinversionDia = $totalFinal * 0.80;
+
+    // 🔹 Calcular reinversión semanal acumulada (sumando la del día actual)
+   $reinversionSemanal = ModeloVentas::mdlCalcularReinversionSemanal($reinversionDia);
+
+    // 🔹 Si es domingo, aplicar descuento por pago de luz (restado de la reinversión semanal)
+    $esDomingo = (date('w') == 0); // 0 = domingo
+    $descuentoLuz = $esDomingo ? 80000 : 0;
+    $reinversionSemanalFinal = max($reinversionSemanal - $descuentoLuz, 0);
+
+    // 🔹 Mensaje automático
+    $observaciones = $esDomingo
+        ? "Se aplicó descuento dominical de $80.000 por pago de luz (restado de la reinversión semanal)."
+        : (!empty($_POST['observaciones']) ? $_POST['observaciones'] : "Sin observaciones.");
+
+  // Guardar en base de datos
+  $datos = [
+    "id_usuario" => $idUsuario,
+    "total_general" => $totalGeneral,
+    "cantidad_ventas" => $cantidadVentas,
+    "boletas_digitales" => $boletasDigitales,
+    "retencion_boletas" => $retencionBoletas,
+    "retencion_tarjeta" => $retencionTarjeta,
+    "descuento_contadora" => $descuentoContadora,
+    "total_final" => $totalFinal,
+    "ganancia_dia" => $gananciaDia,
+    "reinversion" => $reinversionDia,
+    // ✅ nombres ajustados a la tabla y modelo
+    "reinversion_semana" => $reinversionSemanal,
+    "reinversion_semana_final" => $reinversionSemanalFinal,
+    "descuento_luz" => $descuentoLuz,
+    "observaciones" => $observaciones,
+    "es_domingo" => $esDomingo ? 1 : 0
+  ];
+
+    $ok = ModeloVentas::mdlGuardarCierreDiario($datos);
+
+    if ($ok) {
+      $mensaje = $esDomingo
+        ? "Cierre dominical registrado. Se descontaron $80.000 de la reinversión semanal por pago de luz."
+        : "Cierre diario registrado correctamente.";
+
+      echo "<script>
+        Swal.fire({
+          icon:'success',
+          title:'Cierre registrado',
+          text:'$mensaje'
+        }).then(()=>{ window.location='cierre-caja'; });
+      </script>";
+    } else {
+      echo "<script>
+        Swal.fire({
+          icon:'error',
+          title:'Error al guardar',
+          text:'Ocurrió un error al intentar guardar el cierre diario.'
+        });
+      </script>";
     }
   }
 
-  // ---------------------------- LISTAR CIERRE -------------------------------------------------
+  // ---------------------------- LISTAR CIERRES ---------------------------------------
   public static function ctrObtenerCierres() {
     return ModeloVentas::mdlObtenerCierres();
   }
 
-  // ---------------------------- SI EXISTE CIERRE ----------------------------------------------
+  // ---------------------------- SI EXISTE CIERRE HOY ---------------------------------
   public static function ctrExisteCierreHoy(bool $porUsuario = false): bool {
-    $idUsuario = null;
-    if ($porUsuario && !empty($_SESSION['id'])) $idUsuario = (int)$_SESSION['id'];
+    $idUsuario = $porUsuario && !empty($_SESSION['id']) ? (int)$_SESSION['id'] : null;
     return ModeloVentas::mdlExisteCierreHoy($idUsuario);
+  }
+
+  // ---------------------------- RESUMEN MÉTODO DE PAGO -------------------------------
+  public static function ctrResumenMetodoPagoDirecto() {
+    return ModeloVentas::mdlResumenMetodoPago();
+  }
+  // ---------------------------- CALCULAR RETENCIÓN CON TARJETA -----------------------------------
+  public static function ctrCalcularRetencion() {
+    $tabla = "venta";
+    $totalTarjeta = ModeloVentas::mdlObtenerTotalConTarjeta($tabla);
+    $retencion = $totalTarjeta * 0.20;
+
+    return [
+      "total_tarjeta" => $totalTarjeta,
+      "retencion" => $retencion
+    ];
+  }
+
+  // ---------------------------- CALCULAR REINVERSIÓN SEMANAL ----------------------------
+  public static function ctrCalcularReinversionSemanal() {
+    return ModeloVentas::mdlCalcularReinversionSemanal();
+  }
+
+  // ---------------------------- CALCULAR GANANCIAS ----------------------------
+  public static function ctrObtenerGanancias($periodo = 'semana', $fechaSeleccionada = null) {
+    return ModeloVentas::mdlObtenerGanancias($periodo, $fechaSeleccionada);
   }
 }

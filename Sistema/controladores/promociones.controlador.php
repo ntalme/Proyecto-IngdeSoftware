@@ -122,8 +122,51 @@ class ControladorPromociones {
             return;
         }
 
-        // --- Vincular productos (si desea, puede manejar rollback en el modelo) ---
+        // --- Vincular productos ---
         ModeloPromociones::mdlVincularProductos($tablaPromoProd, (int)$idPromocion, $productos);
+
+        /* =======================================================
+        🔹 Registrar en historial (sin modificar la lógica)
+        ======================================================= */
+        require_once "modelos/historial.modelo.php";
+        require_once "controladores/historial.controlador.php";
+
+        $usuario = $_SESSION["usuario"] ?? "desconocido";
+        $modulo  = "Promociones";
+        $accion  = "INSERT";
+        $idRegistro = (int)$idPromocion;
+
+        // 🔹 Obtener nombres e IDs de los productos asociados
+        $productosInfo = [];
+        foreach ($productos as $idProd) {
+            $prod = ModeloProductos::mdlObtenerProductoPorId("producto", $idProd);
+            if ($prod && isset($prod["nombre"])) {
+                $productosInfo[] = "({$idProd}) " . $prod["nombre"];
+            } else {
+                $productosInfo[] = "({$idProd}) Desconocido";
+            }
+        }
+        $listaProductos = implode(", ", $productosInfo);
+
+        $valorAnterior = null;
+        $valorNuevo = json_encode([
+            "tipo"                => $tipo,
+            "parametro"           => $parametro ?? "Sin información",
+            "fecha_inicio"        => $fecha_inicio,
+            "fecha_fin"           => $fecha_fin,
+            "productos_asociados" => $listaProductos,
+            "observacion"         => $observacion ?? "Sin información"
+        ], JSON_UNESCAPED_UNICODE);
+
+        ControladorHistorial::ctrRegistrarCambio(
+            $usuario,
+            $modulo,
+            $accion,
+            $idRegistro,
+            $valorAnterior,
+            $valorNuevo
+        );
+        /* ======================================================= */
 
         // --- Éxito: volver a la MISMA página desde donde se abrió el modal ---
         echo '<script>',
@@ -148,20 +191,76 @@ class ControladorPromociones {
     }
 
     // ---------------------------- ELIMINAR PROMOCIÓN ---------------------------------------
-    public static function ctrBorrarPromocion(){
+    public static function ctrBorrarPromocion() {
 
         if (isset($_GET["idPromocion"])) {
 
             $tabla = "promocion";
-            $datos = $_GET["idPromocion"];
+            $idPromocion = $_GET["idPromocion"];
+
+            // 🔹 Obtener datos antes de eliminar (para el historial)
+            $promocionAntes = ModeloPromociones::mdlObtenerPromocionPorId($tabla, $idPromocion);
+            $productosVinculados = ModeloPromociones::mdlObtenerProductosPorPromocion("promocion_producto", $idPromocion);
+
+            // Crear listado con nombres e IDs de productos
+            $productosInfo = [];
+            if (!empty($productosVinculados)) {
+                foreach ($productosVinculados as $p) {
+                    $prod = ModeloProductos::mdlObtenerProductoPorId("producto", $p["id_producto"]);
+                    if ($prod && isset($prod["nombre"])) {
+                        $productosInfo[] = "({$p['id_producto']}) " . $prod["nombre"];
+                    } else {
+                        $productosInfo[] = "({$p['id_producto']}) Desconocido";
+                    }
+                }
+            }
+
+            // Guardar datos legibles para historial (asegurando que el JSON sea válido)
+            $valorAnteriorArray = [
+                "tipo"                => $promocionAntes["tipo"] ?? "Sin información",
+                "parametro"           => $promocionAntes["parametro"] ?? "Sin información",
+                "fecha_inicio"        => $promocionAntes["fecha_inicio"] ?? "Sin información",
+                "fecha_fin"           => $promocionAntes["fecha_fin"] ?? "Sin información",
+                "productos_asociados" => !empty($productosInfo) ? implode(", ", $productosInfo) : "Sin información",
+                "observacion"         => $promocionAntes["observacion"] ?? "Sin información"
+            ];
+
+            try {
+                $valorAnterior = json_encode($valorAnteriorArray, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+            } catch (Exception $e) {
+                $valorAnterior = json_encode(["error_json" => "No se pudo codificar la promoción eliminada"], JSON_UNESCAPED_UNICODE);
+            }
 
             // Primero eliminar vínculos en la tabla pivote
-            ModeloPromociones::mdlBorrarVinculos("promocion_producto", $datos);
+            ModeloPromociones::mdlBorrarVinculos("promocion_producto", $idPromocion);
 
             // Luego eliminar la promoción
-            $respuesta = ModeloPromociones::mdlBorrarPromocion($tabla, $datos);
+            $respuesta = ModeloPromociones::mdlBorrarPromocion($tabla, $idPromocion);
 
             if ($respuesta == "ok") {
+
+                /* =======================================================
+                🔹 Registrar en historial
+                ======================================================= */
+                require_once "modelos/historial.modelo.php";
+                require_once "controladores/historial.controlador.php";
+
+                $usuario = $_SESSION["usuario"] ?? "desconocido";
+                $modulo  = "Promociones";
+                $accion  = "DELETE";
+                $idRegistro = (int)$idPromocion;
+                $valorNuevo = null;
+
+                ControladorHistorial::ctrRegistrarCambio(
+                    $usuario,
+                    $modulo,
+                    $accion,
+                    $idRegistro,
+                    $valorAnterior,
+                    $valorNuevo
+                );
+                /* ======================================================= */
+
                 echo '<script>
                     Swal.fire({
                         icon: "success",

@@ -88,31 +88,26 @@
   color: inherit !important;
 }
 
-/* ========== Modal Perdida ========== */
-:root{
-  --modal-header-bg: #070b13; 
-  --modal-header-fg: #ffffff;
-}
-
+/* ==================== MODAL PERDIDA ==================== */
 #modalNavbarPerdida .tabla-wrap-navbar{
-    border:1px solid #e5e7eb; border-radius:.9rem; overflow:auto;
-    max-height: 360px; background:#fff;
-  }
-  #modalNavbarPerdida thead th{
-    position:sticky; top:0; z-index:2; background:#eef2ff; border-bottom:1px solid #e5e7eb;
-    font-weight:700; color:#4b5563;
-  }
-  #modalNavbarPerdida .font-mono{
-    font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-  }
-  #modalNavbarPerdida .table tbody tr:hover{ background:#f8fafc; cursor: pointer; }
-  #modalNavbarPerdida tr.seleccionado{ background:#e7f1ff !important; }
-  #modalNavbarPerdida .nombre-celda{ line-height:1.25; }
-  
-/* Header personalizable */
+  border:1px solid #e5e7eb; border-radius:.9rem; overflow:auto;
+  max-height: 360px; background:#fff;
+}
+#modalNavbarPerdida thead th{
+  position:sticky; top:0; z-index:2; background:#929292; border-bottom:1px solid #e5e7eb;
+  font-weight:700; color:#fdfeff;
+}
+#modalNavbarPerdida .font-mono{
+  font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+}
+#modalNavbarPerdida .table tbody tr:hover{ background:#ffc60b; cursor: pointer; }
+#modalNavbarPerdida tr.seleccionado{ background:#ffc60b !important; }
+#modalNavbarPerdida .nombre-celda{ line-height:1.25; }
+
+/* Header fijo (SIN variables) */
 .modal-header-custom{
-  background-color: var(--modal-header-bg) !important;
-  color: var(--modal-header-fg) !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
   border-bottom: none;
 }
 
@@ -127,8 +122,8 @@
 
 /* Botón primario amarillo con letras negras */
 .btn-modern{
-  background-color: #f7c738;   /* Amarillo */
-  color: #000 !important;      /* Texto negro */
+  background-color: #ffc60b !important;
+  color: #000 !important;
   border: none;
   font-weight: 600;
   border-radius: .5rem;
@@ -136,7 +131,7 @@
   transition: transform .05s ease, box-shadow .2s ease, background-color .2s ease;
 }
 .btn-modern:hover{
-  background-color: #e6b800;   /* Amarillo más oscuro */
+  background-color: #ffc60b;
 }
 .btn-modern:active{
   transform: translateY(1px);
@@ -160,7 +155,7 @@
 /* Títulos/labels más legibles */
 .font-weight-semibold{ font-weight: 600; }
 
-/* Select y inputs grandes (consistentes) */
+/* Select e inputs grandes (consistentes) */
 .custom-select-lg, .input-group-lg > .form-control, 
 .input-group-lg > .custom-select, .input-group-lg > .input-group-prepend > .input-group-text,
 .input-group-lg > .input-group-append > .input-group-text{
@@ -172,16 +167,16 @@
 
 /* Badge suave para mostrar stock */
 .badge-soft-info{
-  color: #0c4a6e;
-  background-color: #e0f2fe;
-  border: 1px solid #bae6fd;
+  color: #000000;
+  background-color: #ffc60b;
+  border: 1px solid #ffc60b;
   padding: .45rem .65rem;  
   border-radius: .375rem;
-  font-weight: 700;       
-  font-size: 0.9rem;       
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
-/* Feedback de error más visible cuando corresponda */
+/* Feedback de error visible cuando corresponda */
 .invalid-feedback{ display: none; }
 .is-invalid ~ .invalid-feedback,
 #errorCantidad.is-visible{ display:block; }
@@ -191,71 +186,110 @@
   .modal-dialog.modal-lg{ margin: 1rem; }
 }
 
-/* ========== Modal Promociones ========== */
+/* ==================== MODAL PROMOCIONES ==================== */
 /* ===== Tamaño del diálogo ===== */
 .modal-promos{ max-width:950px; width:100%; }
 
-/* ===== Look general del modal ===== */
-.promo2-modal{
-  border:none; border-radius:14px; overflow:hidden;
-  box-shadow:0 12px 32px rgba(0,0,0,.2);
-  font-size:.92rem;
-}
-.promo2-header{
-  background:#1f2937; padding:.85rem 1rem; font-weight:700;
-}
-.promo2-header .promo2-header-icon{ font-size:1rem; opacity:.9; }
-.promo2-body{ background:#fff; padding:1rem; }
-.promo2-footer{
-  background:#f9fafb; border-top:1px solid #e5e7eb; padding:.8rem 1rem;
-}
-.promo2-primary{
-  background:#2563eb; color:#fff; border-color:#1d4ed8;
-}
-.promo2-primary:hover{ background:#1d4ed8; }
-
-/* ===== Etiquetas y ayudas ===== */
-.promo2-label{ font-weight:700; color:#374151; margin-bottom:.25rem; }
-.promo2-hint{ font-size:.8rem; color:#6b7280; }
-
-/* ===== Ajustes de filas compactas ===== */
-.row-compact .form-group{ margin-bottom:.5rem; }
-
-/* ===== Buscador a la derecha ===== */
-.buscador-prod{ max-width:420px; width:100%; }
-.buscador-prod .input-group-text{ background:#fff; }
-
-/* ===== Tabla con scroll y bordes suaves ===== */
-.promoTable-wrap{
-  max-height:380px; overflow:auto;
-  border:1px solid #e5e7eb; border-radius:10px;
-}
-#promo_tablaProd thead th{
-  position:sticky; top:0; z-index:1;
-  background:#f3f4f6; font-weight:700; font-size:.8rem;
-  color:#374151;
-}
-#promo_tablaProd tbody td{ vertical-align:middle; }
-#promo_tablaProd tbody tr{ cursor:pointer; }
-
-/* ===== Estado seleccionado ===== */
-#promo_tablaProd tbody tr.selected{
-  background:#eef6ff;
-}
-#promo_tablaProd tbody tr.selected td{ color:#0b3b7a; }
-
-/* ===== Franja de ayuda + contador bajo la tabla ===== */
-.promo-helpers{
-  background:#f9fafb;
-  border:1px solid #e5e7eb; border-top:none;
-  border-radius:0 0 10px 10px;
-  padding:.5rem .75rem; margin-top:-1px;
+/* === CONTENEDOR GENERAL DEL MODAL === */
+.modal-promos .modal-content.promo2-modal {
+  border-radius: 8px;
+  border: 1px solid #000000;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
 }
 
-/* ===== Accesibilidad/pequeños detalles ===== */
-.font-mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-.close{ opacity:.8; }
-.close:hover{ opacity:1; }
+/* === HEADER === */
+.promo2-header {
+  background: #000000; /* color header */
+  color: #fff;
+  border-bottom: none;
+}
+
+/* Ícono del header */
+.promo2-header-icon {
+  font-size: 1.3rem;
+}
+
+/* === BODY === */
+.promo2-body .promo2-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: rgb(0, 0, 0)000;
+}
+
+.promo2-body .input-group-text {
+  background: #f3f6fa;
+  border: 1px solid #c6c9ce;
+}
+
+.promo2-body .form-control {
+  border: 1px solid #c6c9ce;
+}
+
+.promo2-body .form-control:focus {
+  border-color: #000000;
+  box-shadow: 0 0 0 0.2rem rgba(0, 74, 143, 0.20);
+}
+
+.promo2-hint {
+  font-size: 0.75rem;
+  color: #000000;
+}
+
+/* === TABLA === */
+#promo_tablaProd tbody tr {
+  cursor: pointer;
+}
+
+#promo_tablaProd tbody tr:hover {
+  background: #ffc60b;
+}
+
+#promo_tablaProd tbody tr.selected {
+  background: #ffc60b !important;
+  font-weight: 600;
+}
+
+/* Caja que envuelve la tabla */
+.promoTable-wrap {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* texto inferior de ayuda */
+.promo-helpers {
+  padding-top: 6px;
+  border-top: 1px solid #eee;
+}
+
+/* === BUSCADOR === */
+.buscador-prod .input-group-text {
+  background: #e9eef3;
+}
+
+.buscador-prod input {
+  border-left: none;
+}
+
+/* === FOOTER === */
+.promo2-footer {
+  border-top: 1px solid #ddd;
+  background: #f7f9fc;
+}
+
+/* Botón primario */
+.promo2-primary {
+  background: #e7c501;
+  border: 1px solid #e7c501;
+  color: #000000;
+  font-weight: 600;
+}
+
+.promo2-primary:hover {
+  background: #cfb20c;
+  border-color: #cfb20c;
+}
 
 /* ===== Responsive fino ===== */
 @media (max-width: 575.98px){

@@ -86,4 +86,40 @@ class ModeloUsuarios {
         $stmt = null;
 
     }
+
+        /* =======================================================
+    🔹 Obtener último usuario creado
+    ======================================================= */
+    public static function mdlObtenerUltimoUsuario($tabla) {
+        $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla ORDER BY id DESC LIMIT 1");
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+
+        /* =======================================================
+    🔹 Obtener usuario por nombre de usuario
+    ======================================================= */
+    public static function mdlObtenerUsuarioPorUsername($tabla, $usuario) {
+        $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE usuario = :usuario LIMIT 1");
+        $stmt->bindParam(":usuario", $usuario, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /* =======================================================
+    🔹 Obtener usuario por ID
+    ======================================================= */
+    public static function mdlObtenerUsuarioPorId($tabla, $idUsuario) {
+        try {
+            $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE id = :id LIMIT 1");
+            $stmt->bindParam(":id", $idUsuario, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+
 }

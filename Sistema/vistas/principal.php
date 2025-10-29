@@ -71,7 +71,9 @@ if (isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") {
       $ruta == "cerrar-sesion" ||
       $ruta == "stock-critico" ||
       $ruta == "registrarpc" ||
+      $ruta == "historial" ||
       $ruta == "cierre-caja" ||
+      $ruta == "ganancias" ||
       
 
       // Estas rutas son exclusivas del rol "Administrador"
@@ -108,3 +110,44 @@ if (isset($_SESSION["iniciarSesion"]) && $_SESSION["iniciarSesion"] == "ok") {
 
 </body>
 </html>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("btnCalcular");
+  const tipoSelect = document.getElementById("tipoPeriodo");
+  const resultadoDiv = document.getElementById("resultadoGanancia");
+  const monto = document.getElementById("gananciaPeriodo");
+  const detalle = document.getElementById("detallePeriodo");
+
+  btn.addEventListener("click", async () => {
+    const tipo = tipoSelect.value;
+
+    try {
+      const response = await fetch("ajax/ganancias.ajax.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `accion=calcularGanancia&periodo=${tipo}`,
+      });
+
+      const data = await response.json();
+      if (!data.ok) throw new Error(data.error || "Error desconocido");
+
+      const formatoCLP = new Intl.NumberFormat("es-CL", {
+        style: "currency",
+        currency: "CLP",
+        minimumFractionDigits: 0,
+      });
+
+      monto.textContent = formatoCLP.format(data.ganancia);
+      detalle.textContent = `Período: ${data.descripcion}`;
+      resultadoDiv.style.display = "block";
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Error al calcular ganancia",
+        text: err.message,
+      });
+    }
+  });
+});
+</script>

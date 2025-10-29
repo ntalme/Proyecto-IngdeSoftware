@@ -6,12 +6,14 @@ require_once  "controladores/ventas.controlador.php";
 require_once  "controladores/productos.controlador.php";
 require_once  "controladores/registropc.controlador.php";
 require_once  "controladores/promociones.controlador.php";
+require_once  "controladores/historial.controlador.php";
 
 require_once  "modelos/usuarios.modelo.php";
 require_once  "modelos/ventas.modelo.php";
 require_once  "modelos/producto.modelo.php";
 require_once  "modelos/registropc.modelo.php";
 require_once  "modelos/promociones.modelo.php";
+require_once  "modelos/historial.modelo.php";
 
 if (isset($_GET['ruta']) && $_GET['ruta'] === 'stock-critico' && isset($_GET['export'])) {
   require_once "controladores/productos.controlador.php";

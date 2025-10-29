@@ -113,181 +113,192 @@ class ModeloVentas {
     }
 
     // ---------------------------- OBTENER DETALLE -----------------------------------------
-    public static function mdlObtenerDetalle(int $idVenta): array{
-        $venta = self::mdlObtenerVenta($idVenta);
-        if (!$venta || empty($venta['productos'])) return [];
+    // ---------------------------- OBTENER DETALLE -----------------------------------------
+  public static function mdlObtenerDetalle(int $idVenta): array {
+      $venta = self::mdlObtenerVenta($idVenta);
+      if (!$venta || empty($venta['productos'])) return [];
 
-        $items = json_decode($venta['productos'], true);
-        if (!is_array($items)) return [];
+      $items = json_decode($venta['productos'], true);
+      if (!is_array($items)) return [];
 
-        $detalle = [];
+      $detalle = [];
 
-        foreach ($items as $it) {
-            
-            $idProd = (int)($it['id_producto'] ?? $it['id'] ?? 0);
-            $nombre  = (string)($it['nombre'] ?? $it['producto'] ?? '');
-            $marca   = (string)($it['marca'] ?? '');
-            $formato = (string)($it['formato'] ?? $it['presentacion'] ?? '');
-            $tamano  = (string)($it['tamano'] ?? $it['tamaño'] ?? $it['size'] ?? '');
-            $cant    = (float)($it['cantidad'] ?? 1);
+      foreach ($items as $it) {
 
-           
-            $precio = (float)(
-                $it['precio'] ??
-                $it['precio_venta'] ??
-                $it['precioUnitario'] ??
-                $it['unit_price'] ?? 0.0
-            );
-            if ($precio <= 0) {
-                $precio = self::mdlPrecioDesdeCatalogo($it);
-            }
+          $idProd = (int)($it['id_producto'] ?? $it['id'] ?? 0);
+          $nombre  = (string)($it['nombre'] ?? $it['producto'] ?? '');
+          $marca   = (string)($it['marca'] ?? '');
+          $formato = (string)($it['formato'] ?? $it['presentacion'] ?? '');
+          $tamano  = (string)($it['tamano'] ?? $it['tamaño'] ?? $it['size'] ?? '');
+          $cant    = (float)($it['cantidad'] ?? 1);
 
-            if ($idProd > 0 && (empty($marca) || empty($formato) || empty($tamano) || empty($nombre))) {
-                $cat = self::mdlProductoPorId($idProd);
-                if ($cat) {
-                    if (!$nombre && !empty($cat['nombre']))   $nombre  = (string)$cat['nombre'];
-                    if (!$marca  && !empty($cat['marca']))    $marca   = (string)$cat['marca'];
-                    if (!$formato&& !empty($cat['formato']))  $formato = (string)$cat['formato'];
-                    if (!$tamano && !empty($cat['tamano']))   $tamano  = (string)$cat['tamano'];
-                }
-            }
+          // 🔹 Tomar siempre el precio final histórico del JSON de la venta
+          $precio = (float)($it['precio_final'] ?? $it['precio'] ?? $it['precioUnitario'] ?? 0);
 
-            if ($idProd <= 0) $idProd = 0;
-            if ($nombre === '')  $nombre  = 'Producto';
-            if ($marca === '')   $marca   = '-';
-            if ($formato === '') $formato = '-';
-            if ($tamano === '')  $tamano  = '-';
-            if ($cant <= 0)      $cant    = 1;
-            if ($precio < 0)     $precio  = 0;
+          // 🔹 Si no hay precio, usar el total_linea / cantidad como respaldo
+          if ($precio <= 0 && isset($it['total_linea']) && $cant > 0) {
+              $precio = (float)$it['total_linea'] / $cant;
+          }
 
-            $detalle[] = [
-                'id_producto' => $idProd,
-                'producto'    => $nombre,
-                'marca'       => $marca,
-                'formato'     => $formato,
-                'tamano'      => $tamano,
-                'cantidad'    => $cant,
-                'precio'      => $precio,
-                'subtotal'    => $cant * $precio,
-            ];
-        }
+          // 🔹 No consultar la tabla productos — solo completar datos faltantes descriptivos
+          if ($idProd > 0 && (empty($marca) || empty($formato) || empty($tamano) || empty($nombre))) {
+              $cat = self::mdlProductoPorId($idProd);
+              if ($cat) {
+                  if (!$nombre && !empty($cat['nombre']))   $nombre  = (string)$cat['nombre'];
+                  if (!$marca  && !empty($cat['marca']))    $marca   = (string)$cat['marca'];
+                  if (!$formato&& !empty($cat['formato']))  $formato = (string)$cat['formato'];
+                  if (!$tamano && !empty($cat['tamano']))   $tamano  = (string)$cat['tamano'];
+              }
+          }
 
-        return $detalle;
-    }
+          // 🔹 Validaciones básicas
+          if ($idProd <= 0) $idProd = 0;
+          if ($nombre === '')  $nombre  = 'Producto';
+          if ($marca === '')   $marca   = '-';
+          if ($formato === '') $formato = '-';
+          if ($tamano === '')  $tamano  = '-';
+          if ($cant <= 0)      $cant    = 1;
+          if ($precio < 0)     $precio  = 0;
+
+          // 🔹 Calcular subtotal histórico
+          $subtotal = (float)($it['total_linea'] ?? ($cant * $precio));
+
+          $detalle[] = [
+              'id_producto' => $idProd,
+              'producto'    => $nombre,
+              'marca'       => $marca,
+              'formato'     => $formato,
+              'tamano'      => $tamano,
+              'cantidad'    => $cant,
+              'precio'      => $precio,
+              'subtotal'    => $subtotal,
+          ];
+      }
+
+      return $detalle;
+  }
+
 
 /* ========================================== REPORTES =================================================== */
     // ---------------------------- PRODUCTOS VENDIDOS --------------------------------------
-    public static function mdlProductosVendidosPorDia($tablaVenta, $fechaStr) {
-        try {
-            $pdo = Conexion::conectar();
+public static function mdlProductosVendidosPorDia($tablaVenta, $fechaStr) {
+    try {
+        $pdo = Conexion::conectar();
 
-            $sql = "SELECT id, productos FROM {$tablaVenta} WHERE DATE(fecha) = :fecha";
-            $st  = $pdo->prepare($sql);
-            $st->bindParam(":fecha", $fechaStr, PDO::PARAM_STR);
-            $st->execute();
+        $sql = "SELECT id, productos FROM {$tablaVenta} WHERE DATE(fecha) = :fecha";
+        $st  = $pdo->prepare($sql);
+        $st->bindParam(":fecha", $fechaStr, PDO::PARAM_STR);
+        $st->execute();
 
-            $ventas = $st->fetchAll(PDO::FETCH_ASSOC);
+        $ventas = $st->fetchAll(PDO::FETCH_ASSOC);
 
-            $acum = [];
-            $parseCLP = function ($v) {
+        $acum = [];
+        $parseCLP = function ($v) {
             if ($v === null) return 0.0;
             if (is_numeric($v)) return floatval($v);
             $v = (string)$v;
             $v = str_replace(['$', 'CLP', ' ', "\xc2\xa0"], '', $v);
-            $v = str_replace('.', '', $v);   // quita miles
-            $v = str_replace(',', '.', $v);  // coma → punto
+            $v = str_replace('.', '', $v);   // quita separadores de miles
+            $v = str_replace(',', '.', $v);  // convierte coma en punto
             return is_numeric($v) ? floatval($v) : 0.0;
-            };
+        };
 
-            $cacheProducto = [];
+        $cacheProducto = [];
 
-            $obtenerInfoProducto = function ($idProd) use ($pdo, &$cacheProducto) {
-            if (!$idProd) return ["formato"=>"", "tamano"=>"", "precio"=>0.0];
+        $obtenerInfoProducto = function ($idProd) use ($pdo, &$cacheProducto) {
+            if (!$idProd) return ["formato" => "", "tamano" => "", "precio" => 0.0];
             if (isset($cacheProducto[$idProd])) return $cacheProducto[$idProd];
 
-            $info = ["formato"=>"", "tamano"=>"", "precio"=>0.0];
+            $info = ["formato" => "", "tamano" => "", "precio" => 0.0];
 
             try {
                 $q = $pdo->prepare("SELECT * FROM producto WHERE id = :id LIMIT 1");
                 $q->bindParam(":id", $idProd, PDO::PARAM_INT);
                 $q->execute();
                 if ($row = $q->fetch(PDO::FETCH_ASSOC)) {
-        
-                if (isset($row["precio_venta"])) $info["precio"] = floatval($row["precio_venta"]);
-                elseif (isset($row["precio"]))   $info["precio"] = floatval($row["precio"]);
 
-                if (isset($row["formato"]) && $row["formato"] !== "") {
-                    $info["formato"] = trim($row["formato"]);
-                }
+                    if (isset($row["precio_venta"])) $info["precio"] = floatval($row["precio_venta"]);
+                    elseif (isset($row["precio"]))   $info["precio"] = floatval($row["precio"]);
 
-                if      (isset($row["tamano"]) && $row["tamano"]!=="")   $info["tamano"] = trim($row["tamano"]);
-                elseif  (isset($row["tamaño"]) && $row["tamaño"]!=="")   $info["tamano"] = trim($row["tamaño"]);
-                elseif  (isset($row["presentacion"]) && $row["presentacion"]!=="") $info["tamano"] = trim($row["presentacion"]);
+                    if (!empty($row["formato"])) $info["formato"] = trim($row["formato"]);
+
+                    if (!empty($row["tamano"])) $info["tamano"] = trim($row["tamano"]);
+                    elseif (!empty($row["tamaño"])) $info["tamano"] = trim($row["tamaño"]);
+                    elseif (!empty($row["presentacion"])) $info["tamano"] = trim($row["presentacion"]);
                 }
             } catch (\Throwable $e) {}
 
             return $cacheProducto[$idProd] = $info;
-            };
+        };
 
-            foreach ($ventas as $v) {
+        foreach ($ventas as $v) {
             $raw = $v["productos"];
             if (!$raw) continue;
 
             $items = json_decode($raw, true);
-            if (!is_array($items)) continue; 
+            if (!is_array($items)) continue;
 
             foreach ($items as $it) {
                 $idProd   = isset($it["id"]) ? (int)$it["id"] : null;
                 $nombre   = isset($it["nombre"]) ? trim($it["nombre"]) : "-";
                 $cantidad = isset($it["cantidad"]) ? floatval($it["cantidad"]) : 0.0;
 
-                $formatoItem = $it["formato"] ?? ""; 
-                $tamanoItem  = $it["tamano"]  ?? ($it["tamaño"] ?? ($it["presentacion"] ?? ""));
+                $formatoItem = $it["formato"] ?? "";
+                $tamanoItem  = $it["tamano"] ?? ($it["tamaño"] ?? ($it["presentacion"] ?? ""));
 
                 $infoProd = $obtenerInfoProducto($idProd);
                 $formato  = ($formatoItem !== "" ? $formatoItem : $infoProd["formato"]);
                 $tamano   = ($tamanoItem  !== "" ? $tamanoItem  : $infoProd["tamano"]);
 
+                // --- PRECIO REAL DE LA VENTA ---
                 $precioUnit = 0.0;
-                if (isset($it["precioUnitario"]))       $precioUnit = $parseCLP($it["precioUnitario"]);
-                elseif (isset($it["precio"]))           $precioUnit = $parseCLP($it["precio"]);
-                elseif (isset($it["price"]))            $precioUnit = $parseCLP($it["price"]);
-                if ($precioUnit <= 0 && $idProd)        $precioUnit = floatval($infoProd["precio"]);
+
+                if (isset($it["precio_final"])) {
+                    $precioUnit = $parseCLP($it["precio_final"]);
+                } elseif (isset($it["total_linea"]) && $cantidad > 0) {
+                    $precioUnit = $parseCLP($it["total_linea"]) / $cantidad;
+                } elseif (isset($it["precio_base"])) {
+                    // solo como respaldo, en caso de que no haya descuento
+                    $precioUnit = $parseCLP($it["precio_base"]);
+                }
+
+                // si no hay nada, dejar en 0
+                if ($precioUnit <= 0) $precioUnit = 0.0;
 
                 $monto = $cantidad * $precioUnit;
-                $key = ($idProd !== null && $idProd !== 0) ? "id:$idProd" : "nombre:".$nombre;
+                $key = ($idProd !== null && $idProd !== 0) ? "id:$idProd" : "nombre:" . $nombre;
 
                 if (!isset($acum[$key])) {
-                $acum[$key] = [
-                    "id_producto"     => $idProd,
-                    "nombre_producto" => $nombre,
-                    "formato"         => $formato,
-                    "tamano"          => $tamano,
-                    "cantidad_total"  => 0.0,
-                    "monto_total"     => 0.0,
-                ];
+                    $acum[$key] = [
+                        "id_producto"     => $idProd,
+                        "nombre_producto" => $nombre,
+                        "formato"         => $formato,
+                        "tamano"          => $tamano,
+                        "cantidad_total"  => 0.0,
+                        "monto_total"     => 0.0,
+                    ];
                 } else {
-                if ($acum[$key]["formato"] === "" && $formato !== "") $acum[$key]["formato"] = $formato;
-                if ($acum[$key]["tamano"]  === "" && $tamano  !== "") $acum[$key]["tamano"]  = $tamano;
+                    if ($acum[$key]["formato"] === "" && $formato !== "") $acum[$key]["formato"] = $formato;
+                    if ($acum[$key]["tamano"] === "" && $tamano !== "")   $acum[$key]["tamano"]  = $tamano;
                 }
 
                 $acum[$key]["cantidad_total"] += $cantidad;
                 $acum[$key]["monto_total"]    += $monto;
             }
-            }
+        }
 
-            $lista = array_values($acum);
-            usort($lista, function ($a, $b) {
+        $lista = array_values($acum);
+        usort($lista, function ($a, $b) {
             if ($a["cantidad_total"] == $b["cantidad_total"]) return 0;
             return ($a["cantidad_total"] > $b["cantidad_total"]) ? -1 : 1;
-            });
+        });
 
-            return $lista;
+        return $lista;
 
-        } catch (Exception $e) {
-            return false;
-        }
+    } catch (Exception $e) {
+        return false;
     }
+}
 
     // ---------------------------- VENTAS DIARIAS ------------------------------------------
     public static function mdlVentasDiariasPorHora($tablaVenta, $fechaStr) {
@@ -345,127 +356,275 @@ class ModeloVentas {
     }
 
 /* ========================================== CIERRE =================================================== */
-    // ---------------------------- TOTAL DEL DIA ------------------------------------------
-    public static function mdlTotalDelDia(): float {
-        $pdo = Conexion::conectar();
-        $stmt = $pdo->prepare("SELECT COALESCE(SUM(total),0) FROM venta WHERE DATE(fecha)=CURDATE()");
-        $stmt->execute();
-        return (float)$stmt->fetchColumn();
-    }
+// ---------------------------- TOTAL DEL DÍA ----------------------------------------
+  public static function mdlTotalDelDia(): float {
+    $pdo = Conexion::conectar();
+    $stmt = $pdo->prepare("SELECT COALESCE(SUM(total),0) FROM venta WHERE DATE(fecha)=CURDATE()");
+    $stmt->execute();
+    return (float)$stmt->fetchColumn();
+  }
 
-    // ---------------------------- CANTIDAD DEL DIA ---------------------------------------
-    public static function mdlCantidadDelDia(): int {
-        $pdo = Conexion::conectar();
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM venta WHERE DATE(fecha)=CURDATE()");
-        $stmt->execute();
-        return (int)$stmt->fetchColumn();
-    }
+  // ---------------------------- CANTIDAD DEL DÍA -------------------------------------
+  public static function mdlCantidadDelDia(): int {
+    $pdo = Conexion::conectar();
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM venta WHERE DATE(fecha)=CURDATE()");
+    $stmt->execute();
+    return (int)$stmt->fetchColumn();
+  }
 
-    // ---------------------------- VENTAS DEL DIA -----------------------------------------
-    private static function mdlIdsVentasDelDia(): array {
-        $pdo = Conexion::conectar();
-        $st = $pdo->prepare("SELECT id FROM venta WHERE DATE(fecha)=CURDATE()");
-        $st->execute();
-        return $st->fetchAll(PDO::FETCH_COLUMN);
-    }
-    
-    // ---------------------------- VESTAS CON DETALLE -------------------------------------
-    private static function ventasDelDiaConDetalle(): array {
-        $pdo = Conexion::conectar();
-        $sql = "SELECT id, fecha, total, metodo_pago, productos
-                  FROM venta
-                 WHERE DATE(fecha)=CURDATE()
-              ORDER BY id ASC";
-        $st = $pdo->prepare($sql);
-        $st->execute();
-        $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+  // ---------------------------- EXISTE CIERRE HOY ------------------------------------
+  public static function mdlExisteCierreHoy(?int $idUsuario = null): bool {
+    $pdo = Conexion::conectar();
+    $sql = "SELECT 1 FROM cierre_caja WHERE DATE(fecha_cierre)=CURDATE()";
+    if ($idUsuario !== null) $sql .= " AND id_usuario=:idUsuario";
+    $sql .= " LIMIT 1";
+    $st = $pdo->prepare($sql);
+    if ($idUsuario !== null) $st->bindParam(':idUsuario', $idUsuario, PDO::PARAM_INT);
+    $st->execute();
+    return (bool)$st->fetchColumn();
+  }
 
-        $detalle = [];
-        foreach ($rows as $r) {
-            $productos = json_decode($r['productos'], true);
-            if ($productos === null && json_last_error() !== JSON_ERROR_NONE) {
-                // Si el JSON viniera mal formado, lo guardamos como string para no perder la traza
-                $productos = $r['productos'];
-            }
-            $detalle[] = [
-                'id_venta'    => (int)$r['id'],
-                'fecha'       => $r['fecha'],
-                'total'       => (float)$r['total'],
-                'metodo_pago' => $r['metodo_pago'],
-                'productos'   => $productos, // ← igual a venta.productos
-            ];
+  // ---------------------------- GUARDAR CIERRE DIARIO --------------------------------
+  public static function mdlGuardarCierreDiario(array $datos): bool {
+    $pdo = Conexion::conectar();
+
+    // Obtener detalle completo de ventas del día
+    $detalleVentas = self::ventasDelDiaConDetalle();
+    $ventasJson = json_encode($detalleVentas, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+    // Calcular ventas con tarjeta y efectivo
+    $sqlPagos = "
+      SELECT metodo_pago, 
+            COUNT(*) AS cantidad, 
+            SUM(total) AS monto 
+      FROM venta 
+      WHERE DATE(fecha) = CURDATE() 
+      GROUP BY metodo_pago
+    ";
+
+    $ventasTarjeta = 0;
+    $cantidadTarjeta = 0;
+    $ventasEfectivo = 0;
+    $cantidadEfectivo = 0;
+
+    try {
+      $stmtPagos = $pdo->query($sqlPagos);
+      $pagos = $stmtPagos->fetchAll(PDO::FETCH_ASSOC);
+
+      foreach ($pagos as $pago) {
+        $metodo = strtolower(trim($pago['metodo_pago']));
+        if ($metodo === 'tarjeta') {
+          $ventasTarjeta = (float)$pago['monto'];
+          $cantidadTarjeta = (int)$pago['cantidad'];
+        } elseif ($metodo === 'efectivo') {
+          $ventasEfectivo = (float)$pago['monto'];
+          $cantidadEfectivo = (int)$pago['cantidad'];
         }
-        return $detalle;
+      }
+
+      // Detectar si es domingo
+      $esDomingo = date('w') == 0;
+      $descuentoLuz = $esDomingo ? 80000 : 0;
+
+      // Calcular reinversión semanal final
+      $reinversionSemanal = $datos['reinversion_semana'] ?? 0;
+      $reinversionSemanalFinal = max($reinversionSemanal - $descuentoLuz, 0);
+
+      // Insertar en cierre_caja
+      $sql = "INSERT INTO cierre_caja (
+                fecha_cierre, id_usuario, total_general, cantidad_ventas, ventas_json,
+                boletas_digitales, retencion_boletas, retencion_tarjeta, descuento_contadora,
+                total_final, ganancia_dia, reinversion, observaciones,
+                ventas_tarjeta_cantidad, ventas_tarjeta_monto,
+                ventas_efectivo_cantidad, ventas_efectivo_monto,
+                es_domingo, descuento_luz, reinversion_semana, reinversion_semana_final
+              ) VALUES (
+                NOW(), :id_usuario, :total_general, :cantidad_ventas, :ventas_json,
+                :boletas_digitales, :retencion_boletas, :retencion_tarjeta, :descuento_contadora,
+                :total_final, :ganancia_dia, :reinversion, :observaciones,
+                :ventas_tarjeta_cantidad, :ventas_tarjeta_monto,
+                :ventas_efectivo_cantidad, :ventas_efectivo_monto,
+                :es_domingo, :descuento_luz, :reinversion_semana, :reinversion_semana_final
+              )";
+
+      $stmt = $pdo->prepare($sql);
+
+      // Vincular valores del arreglo base
+      foreach ($datos as $key => $value) {
+        $stmt->bindValue(":$key", $value);
+      }
+
+      // Datos adicionales calculados
+      $stmt->bindParam(":ventas_json", $ventasJson);
+      $stmt->bindParam(":ventas_tarjeta_cantidad", $cantidadTarjeta, PDO::PARAM_INT);
+      $stmt->bindParam(":ventas_tarjeta_monto", $ventasTarjeta);
+      $stmt->bindParam(":ventas_efectivo_cantidad", $cantidadEfectivo, PDO::PARAM_INT);
+      $stmt->bindParam(":ventas_efectivo_monto", $ventasEfectivo);
+
+      // Campos dominicales y reinversión
+      $stmt->bindValue(":es_domingo", $esDomingo ? 1 : 0, PDO::PARAM_INT);
+      $stmt->bindValue(":descuento_luz", $descuentoLuz, PDO::PARAM_INT);
+      $stmt->bindValue(":reinversion_semana", $reinversionSemanal);
+      $stmt->bindValue(":reinversion_semana_final", $reinversionSemanalFinal);
+
+      return $stmt->execute();
+
+    } catch (Throwable $e) {
+      error_log("[mdlGuardarCierreDiario] " . $e->getMessage());
+      return false;
+    }
+  }
+
+  // ---------------------------- OBTENER CIERRES --------------------------------------
+  public static function mdlObtenerCierres(): array {
+    $pdo = Conexion::conectar();
+    $sql = "SELECT cd.*, u.nombre AS usuario
+            FROM cierre_caja cd
+            JOIN usuario u ON u.id = cd.id_usuario
+            ORDER BY cd.id DESC";
+    return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  /* ========================================== RESUMEN FINANCIERO =================================================== */
+  // ---------------------------- RESUMEN MÉTODO DE PAGO -------------------------------
+  public static function mdlResumenMetodoPago(): array {
+    try {
+      $stmt = Conexion::conectar()->prepare("
+        SELECT metodo_pago, COUNT(*) AS cantidad_ventas, SUM(total) AS monto_total
+        FROM venta
+        WHERE DATE(fecha)=CURDATE()
+        GROUP BY metodo_pago
+      ");
+      $stmt->execute();
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      return [["error" => $e->getMessage()]];
+    }
+  }
+    // ---------------------------- VENTAS CON DETALLE -----------------------------------
+  public static function ventasDelDiaConDetalle(): array {
+    $pdo = Conexion::conectar();
+    $sql = "SELECT id, fecha, total, metodo_pago, productos
+            FROM venta
+            WHERE DATE(fecha)=CURDATE()
+            ORDER BY id ASC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  // ---------------------------- TOTAL CON TARJETA ------------------------------------
+  static public function mdlObtenerTotalConTarjeta($tabla): float {
+    $stmt = Conexion::conectar()->prepare("
+      SELECT SUM(total) AS total_tarjeta
+      FROM $tabla
+      WHERE DATE(fecha) = CURDATE() AND metodo_pago = 'tarjeta'
+    ");
+    $stmt->execute();
+    $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+    return (float)($resultado['total_tarjeta'] ?? 0);
+  }
+
+  // ---------------------------- CALCULAR REINVERSIÓN SEMANAL ----------------------------
+  public static function mdlCalcularReinversionSemanal(float $reinversionDiaActual = 0): float {
+      $pdo = Conexion::conectar();
+
+      try {
+          // Sumar todas las reinversiones registradas en la semana actual (lunes a domingo)
+          $sql = "
+              SELECT SUM(reinversion) AS total_reinversion
+              FROM cierre_caja
+              WHERE YEARWEEK(fecha_cierre, 1) = YEARWEEK(CURDATE(), 1)
+          ";
+          $stmt = $pdo->query($sql);
+          $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+          // Total acumulado + la reinversión del día actual
+          $total = (float)($result['total_reinversion'] ?? 0) + (float)$reinversionDiaActual;
+
+          return $total;
+
+      } catch (Throwable $e) {
+          error_log('[mdlCalcularReinversionSemanal] ' . $e->getMessage());
+          return 0;
+      }
+  }
+
+  // ---------------------------- CALCULAR GANANCIAS ----------------------------
+  public static function mdlObtenerGanancias($periodo = 'semana', $fechaSeleccionada = null) {
+    $pdo = Conexion::conectar();
+
+    // Determinar el rango de fechas según el tipo de período
+    if ($periodo === 'semana') {
+      // Si no se seleccionó semana, usar la actual
+      $semanaIso = $fechaSeleccionada ?? date('o-\WW');
+      [$inicio, $fin] = self::obtenerRangoSemana($semanaIso);
+    } else {
+      // Si no se seleccionó mes, usar el actual
+      $mesIso = $fechaSeleccionada ?? date('Y-m');
+      [$inicio, $fin] = self::obtenerRangoMes($mesIso);
     }
 
-    // ---------------------------- GUARDAR CIERRE -----------------------------------------
-    public static function mdlGuardarCierre(int $idUsuario, float $total, int $cantidad) : bool {
-        $pdo = Conexion::conectar();
+    // DETALLE
+    $sqlDetalle = "
+      SELECT 
+        DATE(fecha_cierre) AS fecha,
+        total_final,
+        ganancia_dia,
+        reinversion
+      FROM cierre_caja
+      WHERE DATE(fecha_cierre) BETWEEN :inicio AND :fin
+      ORDER BY fecha_cierre ASC
+    ";
+    $stmtDetalle = $pdo->prepare($sqlDetalle);
+    $stmtDetalle->bindParam(":inicio", $inicio);
+    $stmtDetalle->bindParam(":fin", $fin);
+    $stmtDetalle->execute();
+    $detalle = $stmtDetalle->fetchAll(PDO::FETCH_ASSOC);
 
-        // Defensa en profundidad: evitar doble cierre por carrera
-        if (self::mdlExisteCierreHoy(null /* o $idUsuario si quiere por usuario */)) {
-            return false; // ya hay cierre hoy
-        }
+    // TOTALES
+    $sqlTotales = "
+      SELECT 
+        SUM(total_final) AS ventas_total,
+        SUM(ganancia_dia) AS ganancia_total,
+        SUM(reinversion) AS reinversion_total
+      FROM cierre_caja
+      WHERE DATE(fecha_cierre) BETWEEN :inicio AND :fin
+    ";
+    $stmtTotales = $pdo->prepare($sqlTotales);
+    $stmtTotales->bindParam(":inicio", $inicio);
+    $stmtTotales->bindParam(":fin", $fin);
+    $stmtTotales->execute();
+    $totales = $stmtTotales->fetch(PDO::FETCH_ASSOC) ?: [];
 
-        $ventas     = self::mdlIdsVentasDelDia();
-        $detalle    = self::ventasDelDiaConDetalle();
-        $ventasJson = json_encode($detalle, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    return [
+      "detalle" => $detalle,
+      "totales" => [
+        "ventas_total" => $totales["ventas_total"] ?? 0,
+        "ganancia_total" => $totales["ganancia_total"] ?? 0,
+        "reinversion_total" => $totales["reinversion_total"] ?? 0
+      ]
+    ];
+  }
 
-        try {
-            $pdo->beginTransaction();
+  // ---------------------------- FUNCIONES AUXILIARES PARA RANGO DE FECHAS ----------------------------
+  private static function obtenerRangoSemana($semanaIso) {
+    // Formato ISO: "2025-W45"
+    [$year, $week] = explode('-W', $semanaIso);
+    $dto = new DateTime();
+    $dto->setISODate((int)$year, (int)$week);
+    $inicio = $dto->format('Y-m-d');
+    $dto->modify('+6 days');
+    $fin = $dto->format('Y-m-d');
+    return [$inicio, $fin];
+  }
 
-            // 6 columnas -> 6 valores (2 NOW() + 4 ?)
-            $sqlCierre = "INSERT INTO cierre_caja 
-                            (fecha_cierre, id_usuario, total_ventas, cantidad_ventas, ventas_json, creado_en)
-                        VALUES (NOW(), ?, ?, ?, ?, NOW())";
-            $st = $pdo->prepare($sqlCierre);
-            $st->execute([$idUsuario, $total, $cantidad, $ventasJson]);
+  private static function obtenerRangoMes($mesIso) {
+    // Formato: "2025-11"
+    $inicio = $mesIso . '-01';
+    $fin = date('Y-m-t', strtotime($inicio)); // Último día del mes
+    return [$inicio, $fin];
+  }
 
-            $idCierre = (int)$pdo->lastInsertId();
-
-            if (!empty($ventas)) {
-                $in      = implode(',', array_fill(0, count($ventas), '?'));
-                $sqlUpd  = "UPDATE venta SET id_cierre_caja = ? WHERE id IN ($in)";
-                $stUpd   = $pdo->prepare($sqlUpd);
-                $params  = array_merge([$idCierre], $ventas);
-                $stUpd->execute($params);
-            }
-
-            $pdo->commit();
-            return true;
-
-        } catch (Throwable $e) {
-            if ($pdo->inTransaction()) $pdo->rollBack();
-            error_log("[CIERRE_CAJA] ".$e->getMessage());
-            echo '<pre style="white-space:pre-wrap;background:#222;color:#eee;padding:10px;border-radius:6px;">'
-            .'Error cierre_caja: '.$e->getMessage().'</pre>';
-            return false;
-        }
-    }
-
-    // ---------------------------- OBTENER CIERRES ----------------------------------------
-    public static function mdlObtenerCierres(): array {
-        $pdo = Conexion::conectar();
-        $sql = "SELECT cc.id, cc.fecha_cierre, cc.id_usuario,
-                       cc.total_ventas, cc.cantidad_ventas, cc.creado_en,
-                       cc.ventas_json,
-                       u.nombre AS usuario
-                  FROM cierre_caja cc
-                  JOIN usuario u ON u.id = cc.id_usuario
-              ORDER BY cc.id DESC";
-        return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // ---------------------------- SI EXISTE CIERRE ---------------------------------------
-    public static function mdlExisteCierreHoy(?int $idUsuario = null): bool {
-        $pdo = Conexion::conectar();
-        $sql = "SELECT 1 FROM cierre_caja WHERE DATE(fecha_cierre) = CURDATE()";
-        if ($idUsuario !== null) { $sql .= " AND id_usuario = :idUsuario"; }
-        $sql .= " LIMIT 1";
-        $st = $pdo->prepare($sql);
-        if ($idUsuario !== null) $st->bindParam(':idUsuario', $idUsuario, PDO::PARAM_INT);
-        $st->execute();
-        return (bool)$st->fetchColumn();
-    }
-    
 }
+

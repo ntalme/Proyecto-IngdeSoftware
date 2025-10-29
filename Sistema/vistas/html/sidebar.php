@@ -139,6 +139,14 @@ $rutaActiva = $_GET["ruta"] ?? "inicio";
                             <p>Reporte Ventas</p>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="ganancias" class="nav-link">
+                            <i class="fas fa-chart-pie nav-icon"></i>
+                            <p>Ganancias</p>
+                        </a>
+                        </li>
+
                 </ul>
                 </li>
                 <!-- Opción: Administrar Usuarios -->                
@@ -149,6 +157,15 @@ $rutaActiva = $_GET["ruta"] ?? "inicio";
                         <?php if ($_SESSION["rol"] !== "Administrador"): ?> onclick="sinPermisoMenu(); return false;" <?php endif; ?>>
                         <i class="nav-icon fa-solid fa-users-cog"></i>
                         <p>Administrar Usuarios</p>
+                    </a>
+                </li>
+                <!-- Opción: Historial -->
+                <li class="nav-item">
+                    <a href="<?php echo ($_SESSION["rol"] === "Administrador") ? 'historial' : '#'; ?>"
+                        class="nav-link <?php echo ($rutaActiva == 'historial') ? 'active' : ''; ?>"
+                        <?php if ($_SESSION["rol"] !== "Administrador"): ?> onclick="sinPermisoMenu(); return false;" <?php endif; ?>>
+                        <i class="nav-icon fas fa-history"></i>
+                        <p>Historial de Cambios</p>
                     </a>
                 </li>
             </ul>

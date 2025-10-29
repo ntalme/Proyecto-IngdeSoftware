@@ -79,8 +79,8 @@ $productos = ControladorProductos::ctrProductosStockCritico();
           </div>
 
           <!-- TABLA DE DATOS -->
-         <div class="table-responsive">
-          <table id="tablaStockCritico" class="table-stock text-center">
+          <div class="table-responsive">
+            <table id="tablaStockCritico" class="table-stock text-center">
               <thead>
                 <tr>             
                   <th>CÓDIGO</th>          

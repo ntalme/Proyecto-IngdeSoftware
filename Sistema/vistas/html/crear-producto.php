@@ -1,3 +1,11 @@
+<?php
+// Llamamos al controlador directamente
+require_once "controladores/ventas.controlador.php";
+require_once "modelos/ventas.modelo.php";
+
+$totales = ControladorVentas::ctrResumenMetodoPagoDirecto();
+?>
+
 <!-- Contenedor principal del contenido de la página -->
 <div class="content-wrapper">
 

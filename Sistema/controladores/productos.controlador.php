@@ -10,21 +10,15 @@ class ControladorProductos{
             return;
         }
 
-        // Validaciones de campos 
+        // ---------- Validaciones de campos ----------
         $ok = (
             preg_match('/^[0-9]+$/', $_POST["nuevoCodigo"]) && 
-
-            // Nombre: hasta 100 caracteres, letras/números + símbolos comerciales
             mb_strlen($_POST["nuevoNombreProducto"], 'UTF-8') <= 100 &&
             preg_match('/^[\p{L}\p{N}\s°\.\,\-\(\)\/&%+\#:\'"]+$/u', $_POST["nuevoNombreProducto"]) && 
-
             preg_match('/^[a-zA-Z0-9\sáéíóúÁÉÍÓÚñÑ().,-]+$/u', $_POST["nuevoFormato"]) &&   
             preg_match('/^[0-9a-zA-Z\s°mlMLccCCL.]+$/', $_POST["nuevoTamano"]) && 
-
-            // Marca: hasta 50 caracteres, letras/números + símbolos básicos
             mb_strlen($_POST["nuevaMarca"], 'UTF-8') <= 50 &&
             preg_match('/^[\p{L}\p{N}\s\.\-&\'"]+$/u', $_POST["nuevaMarca"]) && 
-
             preg_match('/^[0-9]+$/', $_POST["nuevaCantidad"]) && 
             preg_match('/^\d+(\.\d{1,2})?$/', $_POST["nuevoPrecioCompra"]) && 
             preg_match('/^\d+(\.\d{1,2})?$/', $_POST["nuevoPrecioVenta"]) && 
@@ -42,11 +36,11 @@ class ControladorProductos{
             return;
         }
 
-        // ---------- Fecha opcional -> NULL si viene vacía ----------
+        // ---------- Fecha opcional ----------
         $fechaV = isset($_POST["nuevaFechaVencimiento"]) ? trim($_POST["nuevaFechaVencimiento"]) : "";
         $fechaV = ($fechaV === "") ? null : $_POST["nuevaFechaVencimiento"];
 
-        // ---------- Procesar imagen (opcional) -> NULL si no hay ----------
+        // ---------- Imagen opcional ----------
         $rutaImagen = null;
         if (isset($_FILES["nuevaImagen"]) && $_FILES["nuevaImagen"]["error"] === UPLOAD_ERR_OK) {
             $tmp  = $_FILES["nuevaImagen"]["tmp_name"];
@@ -69,7 +63,7 @@ class ControladorProductos{
             }
         }
 
-        // ---------- Insertar en tabla ----------
+        // ---------- Insertar producto ----------
         $tabla = "producto";
         $datos = array( 
             "codigo"            => $_POST["nuevoCodigo"], 
@@ -80,14 +74,37 @@ class ControladorProductos{
             "cantidad"          => (int) $_POST["nuevaCantidad"],
             "precio_compra"     => $_POST["nuevoPrecioCompra"],
             "precio_venta"      => $_POST["nuevoPrecioVenta"], 
-            "fecha_vencimiento" => $fechaV,        // NULL si vacío
+            "fecha_vencimiento" => $fechaV,
             "proveedor"         => $_POST["nuevoProveedor"], 
-            "imagen"            => $rutaImagen     // NULL si no hay
+            "imagen"            => $rutaImagen
         ); 
 
         $respuesta = ModeloProductos::mdlIngresarProducto($tabla, $datos);
 
+        // ======================================================
+        // ✅ REGISTRAR EN HISTORIAL SI TODO SALE BIEN
+        // ======================================================
         if ($respuesta === "ok") { 
+
+            require_once "modelos/historial.modelo.php";
+            require_once "controladores/historial.controlador.php";
+
+            $usuario = isset($_SESSION["usuario"]) ? $_SESSION["usuario"] : "desconocido";
+            $modulo = "Productos";
+            $accion = "INSERT";
+            $idRegistro = $_POST["nuevoCodigo"]; // o el ID autogenerado si lo devuelves
+            $valorAnterior = null;
+            $valorNuevo = json_encode($datos, JSON_UNESCAPED_UNICODE);
+
+            ControladorHistorial::ctrRegistrarCambio(
+                $usuario,
+                $modulo,
+                $accion,
+                $idRegistro,
+                $valorAnterior,
+                $valorNuevo
+            );
+
             echo '<script>
                 Swal.fire({
                     icon: "success",
@@ -100,6 +117,7 @@ class ControladorProductos{
                     }
                 });
             </script>'; 
+
         } else {
             $detalle = (is_string($respuesta) && strpos($respuesta, "error") === 0) ? $respuesta : "Ocurrió un problema al guardar el producto.";
             echo '<script>
@@ -130,24 +148,21 @@ class ControladorProductos{
     // --------------------------- EDITAR PRODUCTO ----------------------------------------
     public static function ctrEditarProducto(){
 
-        // Revisa si se envió el formulario de edición
         if(isset($_POST["editarProducto"])){
 
-            // Valida nombre y formato
             if (
                 preg_match('/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]+$/u', $_POST["editarNombreProducto"]) &&
                 preg_match('/^[a-zA-Z0-9\sáéíóúÁÉÍÓÚñÑ().,-]+$/u', $_POST["editarFormato"])
             ){
 
                 // ===== Validación y normalización de fecha de vencimiento =====
-                $fechaVenc = null; // por defecto null
+                $fechaVenc = null;
                 if (isset($_POST["editarFechaVencimiento"])) {
                     $fv = trim($_POST["editarFechaVencimiento"]);
                     if ($fv !== "") {
-                        // Acepte 'YYYY-MM-DD' o 'DD/MM/YYYY'
                         $dt = DateTime::createFromFormat('Y-m-d', $fv) ?: DateTime::createFromFormat('d/m/Y', $fv);
                         if ($dt) {
-                            $fechaVenc = $dt->format('Y-m-d'); // normaliza a YYYY-MM-DD
+                            $fechaVenc = $dt->format('Y-m-d');
                         } else {
                             echo '<script>
                                 Swal.fire({
@@ -162,16 +177,13 @@ class ControladorProductos{
                     }
                 }
 
-                // Toma la imagen actual si existe
                 $rutaImagen = isset($_POST["imagenActual"]) ? trim($_POST["imagenActual"]) : "";
 
-                // Revisa si subieron imagen
                 if (isset($_FILES["editarImagen"]) && $_FILES["editarImagen"]["error"] === UPLOAD_ERR_OK) {
                     $tmp  = $_FILES["editarImagen"]["tmp_name"];
                     $size = $_FILES["editarImagen"]["size"];
                     $name = $_FILES["editarImagen"]["name"];
 
-                    // Limita a 2MB
                     if ($size <= 2 * 1024 * 1024) {
                         $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
                         if ($ext === "jpeg") $ext = "jpg";
@@ -191,9 +203,8 @@ class ControladorProductos{
                     }
                 }
 
-                // Define la tabla
                 $tabla = "producto";
-                // Arma arreglo con los datos editados
+
                 $datos = array(
                     "id"                 => $_POST["idProducto"],
                     "nombre"             => $_POST["editarNombreProducto"],
@@ -206,14 +217,45 @@ class ControladorProductos{
                     "precio_venta"       => $_POST["editarPrecioVenta"],
                     "proveedor"          => $_POST["editarProveedor"],
                     "imagen"             => $rutaImagen,
-                    "fecha_vencimiento"  => $fechaVenc // <-- NUEVO
+                    "fecha_vencimiento"  => $fechaVenc
                 );
 
-                // Llama al modelo para actualizar
+                /* Obtener los datos anteriores ANTES de actualizar */
+                $productoAnterior = ModeloProductos::mdlObtenerProductoPorId($tabla, $_POST["idProducto"]);
+
+                // Actualiza el producto
                 $respuesta = ModeloProductos::mdlEditarProducto($tabla, $datos);
 
-                // Si todo salió bien
+                /* Si se actualiza correctamente, registrar cambios*/
+                // --------------------------- REGISTRAR CAMBIOS ----------------------------------------
                 if ($respuesta == "ok") {
+
+                    require_once "modelos/historial.modelo.php";
+                    require_once "controladores/historial.controlador.php";
+
+                    $usuario = isset($_SESSION["usuario"]) ? $_SESSION["usuario"] : "desconocido";
+                    $modulo = "Productos";
+                    $accion = "UPDATE";
+                    $idRegistro = $_POST["idProducto"];
+
+                    // Compara campo por campo
+                    $cambios = [];
+                    foreach ($datos as $campo => $valorNuevo) {
+                        $valorViejo = isset($productoAnterior[$campo]) ? $productoAnterior[$campo] : null;
+                        if ($valorViejo != $valorNuevo) {
+                            $cambios[$campo] = [
+                                "antes" => $valorViejo,
+                                "después" => $valorNuevo
+                            ];
+                        }
+                    }
+
+                    // Guardar solo si hay cambios
+                    if (!empty($cambios)) {
+                        $jsonCambios = json_encode($cambios, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                        ControladorHistorial::ctrRegistrarCambio($usuario, $modulo, $accion, $idRegistro, "Campos modificados", $jsonCambios);
+                    }
+
                     echo '<script>
                         Swal.fire({
                             icon: "success",
@@ -229,7 +271,6 @@ class ControladorProductos{
                 }
 
             } else {
-                // Si falló la validación de nombre/formato
                 echo '<script>
                     Swal.fire({
                         icon: "error",
@@ -252,21 +293,47 @@ class ControladorProductos{
         // Revisa si viene id por GET
         if(isset($_GET["idProducto"])){
 
-            // Define la tabla
             $tabla = "producto";
-            // Toma el id del producto
-            $datos = $_GET["idProducto"];
+            $idProducto = $_GET["idProducto"];
+
+            /* =======================================================
+            🔹 1. Obtener los datos antes de eliminar (para historial)
+            ======================================================= */
+            $productoEliminado = ModeloProductos::mdlObtenerProductoPorId($tabla, $idProducto);
 
             // Llama al modelo para eliminar
-            $respuesta = ModeloProductos::mdlEliminarProducto($tabla, $datos);
+            $respuesta = ModeloProductos::mdlEliminarProducto($tabla, $idProducto);
 
-            // Si la eliminación fue exitosa
+            /* =======================================================
+            🔹 2. Si la eliminación fue exitosa, registrar en historial
+            ======================================================= */
             if ($respuesta == "ok") {
+
+                require_once "modelos/historial.modelo.php";
+                require_once "controladores/historial.controlador.php";
+
+                $usuario = isset($_SESSION["usuario"]) ? $_SESSION["usuario"] : "desconocido";
+                $modulo = "Productos";
+                $accion = "DELETE";
+                $idRegistro = $idProducto;
+
+                // Guardar los datos del producto eliminado
+                $jsonEliminado = json_encode($productoEliminado, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                ControladorHistorial::ctrRegistrarCambio(
+                    $usuario,
+                    $modulo,
+                    $accion,
+                    $idRegistro,
+                    "Registro eliminado",
+                    $jsonEliminado
+                );
+
+                // Mostrar alerta de éxito
                 echo '<script>
                     Swal.fire({
                         icon: "success",
                         title: "¡Producto Borrado!",
-                        text: "El producto ha sido borrado correctamente.",
+                        text: "El producto ha sido eliminado correctamente.",
                         confirmButtonText: "Cerrar"
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -287,30 +354,63 @@ class ControladorProductos{
 
             // Define la tabla
             $tabla = "producto";
-            // Toma el id del producto
             $id = $_POST["idProductoStock"];
-            // Toma la cantidad a sumar
             $cantidadNueva = $_POST["nuevaCantidadStock"];
-            // Toma la fecha de recepción
             $fechaRecepcion = $_POST["nuevaFechaRecepcion"];
-            // Toma la fecha de vencimiento (si aplica)
             $fechaVencimiento = $_POST["nuevaFechaVencimiento"];
 
-            // Llama al modelo
+            // Llama al modelo para sumar stock
             $respuesta = ModeloProductos::mdlSumarStock($tabla, $id, $cantidadNueva, $fechaRecepcion, $fechaVencimiento);
 
             // Si se actualizó correctamente
             if ($respuesta == "ok") {
-            echo '<script>
-                Swal.fire({
-                icon: "success",
-                title: "Stock actualizado",
-                showConfirmButton: false,
-                timer: 1500
-                }).then(() => {
-                window.location = "anadir-stock";
-                });
-            </script>';
+
+                /* =======================================================
+                🔹 Registrar en historial
+                ======================================================= */
+                require_once "modelos/historial.modelo.php";
+                require_once "controladores/historial.controlador.php";
+
+                // Datos del producto antes de la modificación
+                $productoAntes = ModeloProductos::mdlObtenerProductoPorId($tabla, $id);
+
+                $usuario = isset($_SESSION["usuario"]) ? $_SESSION["usuario"] : "desconocido";
+                $modulo = "Stock";
+                $accion = "UPDATE";
+                $idRegistro = $id;
+
+                // Armamos el registro de cambio
+                $valorAnterior = json_encode($productoAntes, JSON_UNESCAPED_UNICODE);
+                $valorNuevo = json_encode([
+                    "producto" => $productoAntes["nombre"] ?? "Desconocido",
+                    "cantidad_agregada" => $cantidadNueva,
+                    "fecha_recepcion" => $fechaRecepcion ?: "Sin información",
+                    "fecha_vencimiento" => $fechaVencimiento ?: "Sin información"
+                ], JSON_UNESCAPED_UNICODE);
+
+                // Guardamos en historial
+                ControladorHistorial::ctrRegistrarCambio(
+                    $usuario,
+                    $modulo,
+                    $accion,
+                    $idRegistro,
+                    $valorAnterior,
+                    $valorNuevo
+                );
+
+                /* =======================================================
+                🔹 Mensaje visual de éxito
+                ======================================================= */
+                echo '<script>
+                    Swal.fire({
+                        icon: "success",
+                        title: "Stock actualizado",
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        window.location = "anadir-stock";
+                    });
+                </script>';
             }
         }
     }
@@ -338,11 +438,41 @@ class ControladorProductos{
                     "stock_minimo" => $min
                 ]);
 
-                if ($res === 'ok') { $ok++; }
-                else { $fail++; $errs[] = "ID $id: error BD"; }
+                if ($res === 'ok') {
+
+                    /* =======================================================
+                    🔹 Registrar en historial
+                    ======================================================= */
+                    require_once "modelos/historial.modelo.php";
+                    require_once "controladores/historial.controlador.php";
+
+                    $producto = ModeloProductos::mdlObtenerProductoPorId("producto", $id);
+                    $usuario = $_SESSION["usuario"] ?? "desconocido";
+
+                    $valorAnterior = null;
+                    $valorNuevo = json_encode([
+                        "producto" => $producto["nombre"] ?? "Desconocido",
+                        "nuevo_stock_minimo" => $min
+                    ], JSON_UNESCAPED_UNICODE);
+
+                    ControladorHistorial::ctrRegistrarCambio(
+                        $usuario,
+                        "Stock",
+                        "UPDATE",
+                        $id,
+                        $valorAnterior,
+                        $valorNuevo
+                    );
+                    /* ======================================================= */
+                    $ok++;
+
+                } else { 
+                    $fail++; 
+                    $errs[] = "ID $id: error BD"; 
+                }
             }
 
-            // Mensajes SweetAlert
+            // --- Mantener tus SweetAlerts intactos ---
             if ($ok && !$fail) {
                 echo "<script>
                         Swal.fire({
@@ -390,6 +520,32 @@ class ControladorProductos{
                 ]);
 
                 if ($res === 'ok') {
+
+                    /* =======================================================
+                    🔹 Registrar en historial
+                    ======================================================= */
+                    require_once "modelos/historial.modelo.php";
+                    require_once "controladores/historial.controlador.php";
+
+                    $producto = ModeloProductos::mdlObtenerProductoPorId("producto", $id);
+                    $usuario = $_SESSION["usuario"] ?? "desconocido";
+
+                    $valorAnterior = null;
+                    $valorNuevo = json_encode([
+                        "producto" => $producto["nombre"] ?? "Desconocido",
+                        "nuevo_stock_minimo" => $min
+                    ], JSON_UNESCAPED_UNICODE);
+
+                    ControladorHistorial::ctrRegistrarCambio(
+                        $usuario,
+                        "Stock mínimo",
+                        "UPDATE",
+                        $id,
+                        $valorAnterior,
+                        $valorNuevo
+                    );
+                    /* ======================================================= */
+
                     echo "<script>
                             Swal.fire({
                             icon: 'success',
@@ -419,6 +575,7 @@ class ControladorProductos{
             }
         }
     }
+
 
     // --------------------------- OBTENER LISTADO DE STOCK CRÍTICO -----------------------
     public static function ctrProductosStockCritico() {
@@ -534,9 +691,8 @@ class ControladorProductos{
         exit;
     }
 
-    /* ========================================= FILTRAR =============================================== */
     // --------------------------- CAMBIAR ESTADO PRODUCTO --------------------------------
-    static public function ctrCambiarEstadoProducto(){
+    public static function ctrCambiarEstadoProducto(){
 
         // Verifica que vengan ambos datos por POST
         if(isset($_POST["idProducto"]) && isset($_POST["nuevoEstado"])){
@@ -558,6 +714,7 @@ class ControladorProductos{
         }
     }
 
+    /* ========================================= FILTRAR =============================================== */
     //--------------------------- MOSTRAR SOLO PRODUCTOS ACTIVOS --------------------------
     public static function ctrMostrarProductosActivos(){
         // Define la tabla

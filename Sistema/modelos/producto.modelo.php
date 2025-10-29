@@ -278,4 +278,12 @@ class ModeloProductos {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
+    public static function mdlObtenerProductoPorId($tabla, $id){
+        $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE id = :id");
+        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
 }

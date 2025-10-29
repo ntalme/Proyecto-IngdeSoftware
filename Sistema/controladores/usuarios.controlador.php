@@ -57,33 +57,83 @@ class ControladorUsuarios {
     // ---------------------------- CREAR USUARIO -----------------------------------------
     public static function ctrCrearUsuario() {
 
-    if (isset($_POST["nuevoUsuario"])) {
+        if (isset($_POST["nuevoUsuario"])) {
 
-        // Validaciones de campos
-       if (
-            preg_match('/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]+$/u', $_POST["nuevoNombre"]) &&
-            preg_match('/^[a-zA-Z0-9_.]+$/', $_POST["nuevoUsuario"]) &&
-            preg_match('/^[a-zA-Z0-9]+$/', $_POST["nuevaPassword"])){
+            // Validaciones de campos
+            if (
+                preg_match('/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]+$/u', $_POST["nuevoNombre"]) &&
+                preg_match('/^[a-zA-Z0-9_.]+$/', $_POST["nuevoUsuario"]) &&
+                preg_match('/^[a-zA-Z0-9]+$/', $_POST["nuevaPassword"])
+            ) {
 
-            $tabla = "usuario";
+                $tabla = "usuario";
+                $encriptar = crypt($_POST["nuevaPassword"], '$2a$07$usesomesillystringforsalt$');
 
-            $encriptar = crypt($_POST["nuevaPassword"], '$2a$07$usesomesillystringforsalt$' );
+                $datos = array(
+                    "nombre" => $_POST["nuevoNombre"],
+                    "usuario" => $_POST["nuevoUsuario"],
+                    "password" => $encriptar,
+                    "rol" => $_POST["nuevoRol"]
+                );
 
-            $datos = array(
-                "nombre" => $_POST["nuevoNombre"],
-                "usuario" => $_POST["nuevoUsuario"], 
-                "password" => $encriptar,
-                "rol" => $_POST["nuevoRol"]
-            );
+                $respuesta = ModeloUsuarios::mdlIngresarUsuario($tabla, $datos);
 
-            $respuesta = ModeloUsuarios::mdlIngresarUsuario($tabla, $datos);
+                if ($respuesta == "ok") {
 
-            if ($respuesta == "ok") {
+                    /* =======================================================
+                    🔹 Registrar en historial
+                    ======================================================= */
+                    require_once "modelos/historial.modelo.php";
+                    require_once "controladores/historial.controlador.php";
+
+                    $usuario = $_SESSION["usuario"] ?? "desconocido";
+                    $modulo  = "Usuarios";
+                    $accion  = "INSERT";
+
+                    // 🔹 Recuperar ID del último usuario creado
+                    $nuevoUsuario = ModeloUsuarios::mdlObtenerUltimoUsuario($tabla);
+
+                    $idRegistro = $nuevoUsuario["id"] ?? null;
+
+                    // 🔹 Armar datos legibles
+                    $valorAnterior = null;
+                    $valorNuevo = json_encode([
+                        "nombre"  => $_POST["nuevoNombre"],
+                        "usuario" => $_POST["nuevoUsuario"],
+                        "rol"     => $_POST["nuevoRol"],
+                        "password" => "********" // no se guarda la clave en texto
+                    ], JSON_UNESCAPED_UNICODE);
+
+                    ControladorHistorial::ctrRegistrarCambio(
+                        $usuario,
+                        $modulo,
+                        $accion,
+                        $idRegistro,
+                        $valorAnterior,
+                        $valorNuevo
+                    );
+                    /* ======================================================= */
+
+                    echo '<script>
+                        Swal.fire({
+                            icon: "success",
+                            title: "¡Usuario registrado!",
+                            text: "El usuario ha sido guardado correctamente.",
+                            confirmButtonText: "Cerrar"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location = "usuarios";
+                            }
+                        });
+                    </script>';
+                }
+
+            } else {
                 echo '<script>
                     Swal.fire({
-                        icon: "success",
-                        title: "¡Usuario registrado!",
-                        text: "El usuario ha sido guardado correctamente.",
+                        icon: "error",
+                        title: "Error al registrar",
+                        text: "El usuario no puede llevar caracteres especiales.",
                         confirmButtonText: "Cerrar"
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -92,21 +142,6 @@ class ControladorUsuarios {
                     });
                 </script>';
             }
-
-        } else {
-            echo '<script>
-                Swal.fire({
-                    icon: "error",
-                    title: "Error al registrar",
-                    text: "El usuario no puede llevar caracteres especiales.",
-                    confirmButtonText: "Cerrar"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location = "usuarios";
-                    }
-                });
-            </script>';
-            }   
         }
     }
 
@@ -123,27 +158,110 @@ class ControladorUsuarios {
     // ---------------------------- EDITAR USUARIOS ---------------------------------------
     public static function ctrEditarUsuario(){
 
-    if(isset($_POST["editarUsuario"])){
+        if(isset($_POST["editarUsuario"])){
 
-        // Validaciones de campos
-        if (preg_match('/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]+$/u', $_POST["editarNombre"])){
+            // Validaciones de campos
+            if (preg_match('/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]+$/u', $_POST["editarNombre"])){
 
-            $tabla = "usuario";
+                $tabla = "usuario";
 
-            // Manejo de contraseña
-            if($_POST["editarPassword"] != ""){
+                // 🔹 Obtener datos anteriores antes de actualizar (para historial)
+                $usuarioAntes = ModeloUsuarios::mdlObtenerUsuarioPorUsername($tabla, $_POST["editarUsuario"]);
 
-                if(preg_match('/^[a-zA-Z0-9]+$/', $_POST["editarPassword"])){
+                // Manejo de contraseña
+                if($_POST["editarPassword"] != ""){
 
-                    $encriptar = crypt($_POST["editarPassword"], '$2a$07$usesomesillystringforsalt$' );
+                    if(preg_match('/^[a-zA-Z0-9]+$/', $_POST["editarPassword"])){
+
+                        $encriptar = crypt($_POST["editarPassword"], '$2a$07$usesomesillystringforsalt$' );
+
+                    } else {
+
+                        echo '<script>
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error al registrar",
+                                text: "La contraseña no puede llevar caracteres especiales.",
+                                confirmButtonText: "Cerrar"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location = "usuarios";
+                                }
+                            });
+                        </script>';
+                        return; // salir para evitar que siga ejecutando
+                    }
 
                 } else {
+                    // Si no se modifica la contraseña, se mantiene la actual
+                    $encriptar = $_POST["passwordActual"];
+                }
+
+                $datos = array(
+                    "nombre" => $_POST["editarNombre"],
+                    "usuario" => $_POST["editarUsuario"],
+                    "password" => $encriptar,
+                    "rol" => $_POST["editarRol"]
+                );
+
+                $respuesta = ModeloUsuarios::mdlEditarUsuario($tabla, $datos);
+
+                if ($respuesta == "ok") {
+
+                    /* =======================================================
+                    🔹 Registrar en historial
+                    ======================================================= */
+                    require_once "modelos/historial.modelo.php";
+                    require_once "controladores/historial.controlador.php";
+
+                    $usuario = $_SESSION["usuario"] ?? "desconocido";
+                    $modulo  = "Usuarios";
+                    $accion  = "UPDATE";
+
+                    $usuarioDespues = ModeloUsuarios::mdlObtenerUsuarioPorUsername($tabla, $_POST["editarUsuario"]);
+                    $idRegistro = $usuarioDespues["id"] ?? null;
+
+                    // Crear arreglo de cambios
+                    $cambios = [];
+
+                    if ($usuarioAntes && $usuarioDespues) {
+                        foreach (["nombre", "usuario", "rol"] as $campo) {
+                            if ($usuarioAntes[$campo] != $usuarioDespues[$campo]) {
+                                $cambios[$campo] = [
+                                    "antes" => $usuarioAntes[$campo],
+                                    "después" => $usuarioDespues[$campo]
+                                ];
+                            }
+                        }
+
+                        // Contraseña
+                        if ($usuarioAntes["password"] != $usuarioDespues["password"]) {
+                            $cambios["password"] = [
+                                "antes" => "********",
+                                "después" => "********"
+                            ];
+                        }
+                    }
+
+                    // Si no hay diferencias, igual se guarda el log vacío
+                    $valorAnterior = json_encode($usuarioAntes, JSON_UNESCAPED_UNICODE);
+                    $valorNuevo = json_encode($cambios ?: ["mensaje" => "Sin cambios detectados"], JSON_UNESCAPED_UNICODE);
+
+                    ControladorHistorial::ctrRegistrarCambio(
+                        $usuario,
+                        $modulo,
+                        $accion,
+                        $idRegistro,
+                        $valorAnterior,
+                        $valorNuevo
+                    );
+                    /* ======================================================= */
 
                     echo '<script>
                         Swal.fire({
-                            icon: "error",
-                            title: "Error al registrar",
-                            text: "La contraseña no puede llevar caracteres especiales.",
+                            icon: "success",
+                            title: "¡Usuario editado!",
+                            text: "El usuario ha sido editado correctamente.",
                             confirmButtonText: "Cerrar"
                         }).then((result) => {
                             if (result.isConfirmed) {
@@ -151,37 +269,7 @@ class ControladorUsuarios {
                             }
                         });
                     </script>';
-                    return; // salir para evitar que siga ejecutando
                 }
-
-            } else {
-                // Si no se modifica la contraseña, se mantiene la actual
-                $encriptar = $_POST["passwordActual"];
-            }
-
-            $datos = array(
-                "nombre" => $_POST["editarNombre"],
-                "usuario" => $_POST["editarUsuario"],
-                "password" => $encriptar,
-                "rol" => $_POST["editarRol"]
-            );
-
-            $respuesta = ModeloUsuarios::mdlEditarUsuario($tabla, $datos);
-
-            if ($respuesta == "ok") {
-                echo '<script>
-                    Swal.fire({
-                        icon: "success",
-                        title: "¡Usuario editado!",
-                        text: "El usuario ha sido editado correctamente.",
-                        confirmButtonText: "Cerrar"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location = "usuarios";
-                        }
-                    });
-                </script>';
-            }
 
             } else {
 
@@ -201,17 +289,54 @@ class ControladorUsuarios {
         }
     }
 
-    // ---------------------------- ELIMINAR USUARIO --------------------------------------
-    public static function ctrBorrarUsuario(){
 
-        if(isset($_GET["idUsuario"])){
+    // ---------------------------- ELIMINAR USUARIO --------------------------------------
+    public static function ctrBorrarUsuario() {
+
+        if (isset($_GET["idUsuario"])) {
 
             $tabla = "usuario";
-            $datos = $_GET["idUsuario"];
+            $idUsuario = $_GET["idUsuario"];
 
-            $respuesta = ModeloUsuarios::mdlBorrarUsuario($tabla, $datos);
+            // 🔹 Obtener los datos del usuario antes de eliminar (para historial)
+            $usuarioAntes = ModeloUsuarios::mdlObtenerUsuarioPorId($tabla, $idUsuario);
+
+            // 🔹 Eliminar usuario
+            $respuesta = ModeloUsuarios::mdlBorrarUsuario($tabla, $idUsuario);
 
             if ($respuesta == "ok") {
+
+                /* =======================================================
+                🔹 Registrar en historial
+                ======================================================= */
+                require_once "modelos/historial.modelo.php";
+                require_once "controladores/historial.controlador.php";
+
+                $usuario = $_SESSION["usuario"] ?? "desconocido";
+                $modulo  = "Usuarios";
+                $accion  = "DELETE";
+                $idRegistro = (int)$idUsuario;
+
+                // Guardar datos legibles
+                $valorAnterior = json_encode([
+                    "id"      => $usuarioAntes["id"] ?? "Sin información",
+                    "nombre"  => $usuarioAntes["nombre"] ?? "Sin información",
+                    "usuario" => $usuarioAntes["usuario"] ?? "Sin información",
+                    "rol"     => $usuarioAntes["rol"] ?? "Sin información"
+                ], JSON_UNESCAPED_UNICODE);
+
+                $valorNuevo = null;
+
+                ControladorHistorial::ctrRegistrarCambio(
+                    $usuario,
+                    $modulo,
+                    $accion,
+                    $idRegistro,
+                    $valorAnterior,
+                    $valorNuevo
+                );
+                /* ======================================================= */
+
                 echo '<script>
                     Swal.fire({
                         icon: "success",
@@ -227,4 +352,5 @@ class ControladorUsuarios {
             }
         }
     }
+
 }

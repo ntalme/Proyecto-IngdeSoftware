@@ -166,7 +166,37 @@ class ModeloPromociones {
             ];
         }
         return $map;
+    }
+
+    /* =======================================================
+   🔹 Obtener datos de una promoción por su ID
+    ======================================================= */
+    public static function mdlObtenerPromocionPorId($tabla, $idPromocion) {
+        try {
+            $stmt = Conexion::conectar()->prepare("SELECT * FROM $tabla WHERE id = :id");
+            $stmt->bindParam(":id", $idPromocion, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return null; // si algo falla, devolvemos null para evitar errores
         }
+    }
+
+    /* =======================================================
+   🔹 Obtener productos asociados a una promoción
+    ======================================================= */
+    public static function mdlObtenerProductosPorPromocion($tabla, $idPromocion) {
+        try {
+            $stmt = Conexion::conectar()->prepare("SELECT id_producto FROM $tabla WHERE id_promocion = :id");
+            $stmt->bindParam(":id", $idPromocion, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return [];
+        }
+    }
 
 
 }
